@@ -34,7 +34,7 @@ body {
   font-family: "Inter", system-ui, sans-serif;
   font-size: 14px;
   line-height: 1.5;
-  overflow: hidden;
+  overflow: auto;
 }
 
 /* ── App shell ── */
@@ -96,8 +96,8 @@ body {
   border-bottom: 0.5px solid var(--border);
   flex-shrink: 0;
   overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
+  scrollbar-width: auto;
+  -webkit-overflow-scrolling: inherit;
 }
 .tabbar::-webkit-scrollbar {
   display: none;
@@ -128,7 +128,7 @@ body {
 .content {
   flex: 1;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: inherit;
   background: var(--bg2);
 }
 .screen {
@@ -707,7 +707,9 @@ canvas {
     color: #000;
     font-size: 12px;
   }
-  .app { display: none !important; }
+  .app {
+    display: none !important;
+  }
 
   .print-header {
     text-align: center;
@@ -767,14 +769,21 @@ canvas {
   .print-cf {
     font-size: 10px;
   }
-  .print-cf th, .print-cf td {
+  .print-cf th,
+  .print-cf td {
     text-align: center;
     padding: 3px 2px;
     font-size: 9px;
   }
-  .print-green { color: #1d9e75; }
-  .print-red { color: #e24b4a; }
-  .print-amber { color: #ba7517; }
+  .print-green {
+    color: #1d9e75;
+  }
+  .print-red {
+    color: #e24b4a;
+  }
+  .print-amber {
+    color: #ba7517;
+  }
   .print-footer {
     margin-top: 30px;
     padding-top: 10px;
