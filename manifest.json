@@ -1,0 +1,17 @@
+{
+  "name": "КГУ Калькулятор",
+  "short_name": "КГУ",
+  "description": "Фінансова модель когенераційної установки 1 МВт",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0F1E",
+  "theme_color": "#0A0F1E",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

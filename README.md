@@ -1,18 +1,77 @@
-# React + Vite
+# COGEN PWA
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Простий React + Vite прогресивний веб-додаток (PWA) для калькулятора фінансів.
 
-Currently, two official plugins are available:
+## 🚀 Структура
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- `src/` — компоненти React
+- `index.html` — основний HTML
+- `vite.config.js` — налаштування Vite
+- `public/` — статичні файли (наприклад `market-data.json`)
+- `manifest.json` — PWA manifest
+- `sw.js` — service worker для офлайн
 
-## React Compiler
+## 🧰 Команди
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+```bash
+npm install
+npm run dev
+npm run build
+npm run preview
+```
 
-Note: This will impact Vite dev & build performances.
+## ✔️ Як перевірити “від нуля” (локально)
 
-## Expanding the ESLint configuration
+```bash
+rm -rf node_modules dist
+npm install
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Або для production-зборки:
+
+```bash
+npm run build
+npx serve dist
+```
+
+## 🌐 Деплой
+
+### Netlify (рекомендується)
+1. Підключити репозиторій до Netlify.
+2. Build command: `npm run build`
+3. Publish directory: `dist`
+4. Натиснути Deploy.
+
+> Якщо у вас SPA та клієнтська маршрутизація, створіть у `dist` файл `_redirects`:
+> ```
+> /* /index.html 200
+> ```
+
+### Vercel
+1. Підключити репозиторій до Vercel.
+2. Build command: `npm run build`
+3. Output Directory: `dist`
+4. Deploy.
+
+### Firebase Hosting
+```bash
+npm install -g firebase-tools
+firebase login
+firebase init hosting
+# Вкажіть 'dist' як public directory
+firebase deploy
+```
+
+## 🧭 Примітки
+
+- Якщо сайт не в корені домену (наприклад `/app/`) або деплоїте підпапку (GitHub Pages), додайте у `vite.config.js`:
+
+```js
+export default defineConfig({
+  base: './', // або '/repo-name/' для GitHub Pages
+  plugins: [react()]
+});
+```
+
+- `manifest.json` та PWA-іконки вже налаштовані для мобільного використання.

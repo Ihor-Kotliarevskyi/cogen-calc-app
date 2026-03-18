@@ -1,121 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState } from 'react';
+import Header from './components/Header.jsx';
+import TabBar from './components/TabBar.jsx';
+import ParamsScreen from './components/ParamsScreen.jsx';
+import DashboardScreen from './components/DashboardScreen.jsx';
+import BalanceScreen from './components/BalanceScreen.jsx';
+import CashflowScreen from './components/CashflowScreen.jsx';
+import ScenariosScreen from './components/ScenariosScreen.jsx';
+import SavedScenariosScreen from './components/SavedScenariosScreen.jsx';
+import { useCalc } from './context/CalcContext.jsx';
+import { useAutoSave } from './hooks/useAutoSave.js';
 
-function App() {
-  const [count, setCount] = useState(0)
+const TABS = [
+  { key: 'params', label: 'Параметри' },
+  { key: 'dash', label: 'Результат' },
+  { key: 'balance', label: 'Баланси' },
+  { key: 'cf', label: 'CF / Графік' },
+  { key: 'sc', label: 'Сценарії' },
+  { key: 'saved', label: 'Збережені' },
+];
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('params');
+  const { P, loading } = useCalc();
+
+  // Auto-save current parameters to localStorage
+  useAutoSave(P);
+
+  if (loading) {
+    return (
+      <div className="app" style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ color: 'var(--text2)', fontSize: 14 }}>Завантаження ринкових даних…</div>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div className="app">
+      <Header />
+      <TabBar tabs={TABS} active={activeTab} onChange={setActiveTab} />
+      <div className="content">
+        {activeTab === 'params' && <ParamsScreen />}
+        {activeTab === 'dash' && <DashboardScreen />}
+        {activeTab === 'balance' && <BalanceScreen />}
+        {activeTab === 'cf' && <CashflowScreen />}
+        {activeTab === 'sc' && <ScenariosScreen />}
+        {activeTab === 'saved' && <SavedScenariosScreen />}
+      </div>
+    </div>
+  );
 }
-
-export default App
