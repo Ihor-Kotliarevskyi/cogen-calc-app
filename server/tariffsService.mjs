@@ -101,7 +101,8 @@ function latestNumberFromCsv(text, valueColumnIndex = 1, filters = []) {
 async function readLocalSnapshot() {
   const localPath = path.resolve(process.cwd(), 'public', 'market-data.json');
   const raw = await fs.readFile(localPath, 'utf8');
-  return JSON.parse(raw);
+  const normalized = raw.replace(/^\uFEFF/, '');
+  return JSON.parse(normalized);
 }
 
 async function fetchEnergyMapCsv({ token, uuid, format = 'csv', language = 'uk' }) {
