@@ -75,3 +75,28 @@ export default defineConfig({
 ```
 
 - `manifest.json` та PWA-іконки вже налаштовані для мобільного використання.
+
+## Tariffs API proxy (Energy Map)
+
+This project supports a server-side tariffs proxy to keep `ENERGYMAP_API_KEY` private and minimize API usage.
+
+### Endpoints
+- Vercel: `/api/tariffs`
+- Netlify: `/.netlify/functions/tariffs`
+
+### Behavior
+- By default returns local `public/market-data.json` snapshot.
+- If `ENERGYMAP_AUTO_SYNC=true`, server refreshes from Energy Map by TTL.
+- Manual refresh: call `?refresh=1` with header `x-sync-token: <TARIFFS_SYNC_TOKEN>`.
+
+### Required server env vars
+- `ENERGYMAP_API_KEY`
+- `ENERGYMAP_GAS_UUID`
+- `ENERGYMAP_RDN_UUID`
+
+### Optional server env vars
+- `ENERGYMAP_GAS_VALUE_COLUMN` (default `1`)
+- `ENERGYMAP_RDN_VALUE_COLUMN` (default `1`)
+- `ENERGYMAP_AUTO_SYNC` (`false` by default)
+- `ENERGYMAP_CACHE_TTL_HOURS` (default `24`)
+- `TARIFFS_SYNC_TOKEN`

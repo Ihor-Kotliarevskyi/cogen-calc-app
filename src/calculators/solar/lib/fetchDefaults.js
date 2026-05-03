@@ -1,11 +1,9 @@
 ﻿import { DEF } from './calc.js';
+import { fetchTariffSnapshot } from '../../../shared/lib/tariffApi.js';
 
 export async function fetchSolarDefaults() {
   try {
-    const response = await fetch('/market-data.json', { cache: 'no-store' });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const data = await response.json();
+    const data = await fetchTariffSnapshot();
     const solar = data?.defaults?.solar ?? {};
 
     return {

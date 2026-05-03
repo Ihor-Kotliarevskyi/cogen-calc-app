@@ -8,7 +8,10 @@ const SLIDERS = [
   { key: 'degradation', label: 'Деградація, %/рік', min: 0.1, max: 2, step: 0.1, fmt: (v) => `${v.toFixed(1)}%` },
   { key: 'selfUseShare', label: 'Частка власного споживання', min: 0, max: 1, step: 0.05, fmt: (v) => `${(v * 100).toFixed(0)}%` },
   { key: 'gridPrice', label: 'Ціна заміщення з мережі, грн/кВт·год', min: 2, max: 12, step: 0.1, fmt: (v) => `${v.toFixed(2)} грн` },
-  { key: 'feedInTariff', label: 'Тариф продажу в мережу, грн/кВт·год', min: 1, max: 10, step: 0.1, fmt: (v) => `${v.toFixed(2)} грн` },
+  { key: 'feedInTariff', label: 'Зелений тариф / базовий продаж, грн/кВт·год', min: 1, max: 10, step: 0.1, fmt: (v) => `${v.toFixed(2)} грн` },
+  { key: 'reserveShare', label: 'Частка генерації в резервування (BESS-модель)', min: 0, max: 1, step: 0.05, fmt: (v) => `${(v * 100).toFixed(0)}%` },
+  { key: 'reserveEfficiency', label: 'ККД циклу резервування', min: 0.5, max: 1, step: 0.01, fmt: (v) => `${(v * 100).toFixed(0)}%` },
+  { key: 'reservePeakPremium', label: 'Премія пікового продажу, грн/кВт·год', min: 0, max: 6, step: 0.1, fmt: (v) => `${v.toFixed(2)} грн` },
   { key: 'capex', label: 'CAPEX, млн грн', min: 2e6, max: 800e6, step: 0.5e6, fmt: (v) => `${fN(v / 1e6, 1)} млн` },
   { key: 'opex', label: 'OPEX, % від CAPEX/рік', min: 0.2, max: 5, step: 0.1, fmt: (v) => `${v.toFixed(1)}%` },
 ];

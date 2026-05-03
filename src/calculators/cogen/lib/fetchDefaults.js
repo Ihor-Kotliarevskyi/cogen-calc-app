@@ -1,17 +1,18 @@
 ﻿import { DEF } from './calc.js';
+import { fetchTariffSnapshot } from '../../../shared/lib/tariffApi.js';
 
 /**
- * Fetch market defaults from market-data.json.
- * Falls back to hardcoded DEF on any error.
+ * Fetch market defaults from API (if configured) with fallback to market-data.json.
  * Returns { defaults, meta } where meta has update date & sources.
  */
 export async function fetchMarketDefaults() {
   try {
-    const res = await fetch('/market-data.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    const data = await fetchTariffSnapshot();
+    const allDefaults = data.defaults || {};
+    const { solar, ...cogenDefaults } = allDefaults;
+
     return {
-      defaults: { ...DEF, ...data.defaults },
+      defaults: { ...DEF, ...cogenDefaults },
       meta: {
         updated: data.updated || null,
         region: data.region || null,
@@ -26,5 +27,3 @@ export async function fetchMarketDefaults() {
     };
   }
 }
-
-

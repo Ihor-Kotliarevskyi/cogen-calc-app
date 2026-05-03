@@ -8,7 +8,8 @@ export default function SolarDashboardScreen() {
   const pbCls = r.pb ? (r.pb < 5 ? 'cg' : r.pb < 8 ? 'ca' : 'cr') : 'cr';
   const rows = [
     { n: 'Економія на власному споживанні', v: r.savings, pos: true },
-    { n: 'Продаж електроенергії в мережу', v: r.exportRevenue, pos: true },
+    { n: 'Продаж електроенергії (прямий)', v: r.directExportRevenue, pos: true },
+    { n: 'Продаж через резервування', v: r.reserveExportRevenue, pos: true },
     { n: 'РАЗОМ ДОХОДИ', v: r.totalRevenue, pos: true, tot: true },
     { n: 'OPEX', v: -r.opexCost, pos: false },
     { n: 'ЧИСТИЙ ПРИБУТОК', v: r.net, pos: r.net > 0, tot: true },
@@ -50,7 +51,11 @@ export default function SolarDashboardScreen() {
                   <span className="pnl-v" style={{ color: row.pos ? 'var(--green)' : 'var(--red)' }}>
                     {row.v >= 0 ? '+' : ''}{fM(row.v, 2)}
                   </span>
-                  {!row.tot && <span className="pnl-pct">{fN((Math.abs(row.v) / r.totalRevenue) * 100, 0)}%</span>}
+                  {!row.tot && (
+                    <span className="pnl-pct">
+                      {r.totalRevenue > 0 ? `${fN((Math.abs(row.v) / r.totalRevenue) * 100, 0)}%` : '—'}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
@@ -60,9 +65,10 @@ export default function SolarDashboardScreen() {
             <div className="sec">Енергетичні показники</div>
             <div className="card">
               <div className="det-row"><span className="det-k">Власне споживання</span><span className="det-v">{fN(r.selfUseKwh, 0)} кВт·год</span></div>
-              <div className="det-row"><span className="det-k">Експорт у мережу</span><span className="det-v">{fN(r.exportKwh, 0)} кВт·год</span></div>
-              <div className="det-row"><span className="det-k">Ціна заміщення</span><span className="det-v">{P.gridPrice.toFixed(2)} грн/кВт·год</span></div>
-              <div className="det-row"><span className="det-k">Тариф продажу</span><span className="det-v">{P.feedInTariff.toFixed(2)} грн/кВт·год</span></div>
+              <div className="det-row"><span className="det-k">Експорт прямий</span><span className="det-v">{fN(r.directExportKwh, 0)} кВт·год</span></div>
+              <div className="det-row"><span className="det-k">В резервування (вхід)</span><span className="det-v">{fN(r.reserveInKwh, 0)} кВт·год</span></div>
+              <div className="det-row"><span className="det-k">З резервування (вихід)</span><span className="det-v">{fN(r.reserveOutKwh, 0)} кВт·год</span></div>
+              <div className="det-row"><span className="det-k">Втрати резервування</span><span className="det-v">{fN(r.reserveLossKwh, 0)} кВт·год</span></div>
             </div>
           </div>
         </div>

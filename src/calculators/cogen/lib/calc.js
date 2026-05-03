@@ -18,15 +18,15 @@
 };
 
 export function calc(p) {
-  const EL = p.elMW ?? 1.0;
-  const TH = p.thMW ?? 1.1;
-  const EFF = p.eff ?? 0.4;
+  const EL = Math.max(0, p.elMW ?? 1.0);
+  const TH = Math.max(0, p.thMW ?? 1.1);
+  const EFF = Math.max(0.01, p.eff ?? 0.4);
 
   const GHV = 8.5;
   const GHP = 0.15;
   const DHW = 1700;
 
-  const h = Math.round(8760 * p.av);
+  const h = Math.round(8760 * Math.max(0, Math.min(1, p.av ?? 0)));
   const hW = Math.round((h * 5) / 12);
   const hS = h - hW;
 
@@ -34,7 +34,7 @@ export function calc(p) {
   const gAnn = gm3 * h;
   const gCost = (gAnn / 1000) * p.gp;
 
-  const thG = TH - GHP;
+  const thG = Math.max(0, TH - GHP);
   const gcW = thG * 0.86 * hW;
   const gcS = thG * 0.86 * hS * p.sh;
   const gcT = gcW + gcS;
@@ -42,7 +42,7 @@ export function calc(p) {
   const hRev = gcT * p.hp;
   const hIS = gcI * DHW;
 
-  const ep = (p.rdm + p.trans + p.distr) / 1000;
+  const ep = Math.max(0, (p.rdm + p.trans + p.distr) / 1000);
 
   const lW = p.elB + p.vrfW;
   const lS = p.elB + p.vrfS;
@@ -56,9 +56,9 @@ export function calc(p) {
   const ks = cW * 1000 * hW + cS * 1000 * hS;
   const eSav = ks * ep;
   const kGen = EL * 1000 * h;
-  const ecg = gCost / kGen;
+  const ecg = kGen > 0 ? gCost / kGen : 0;
 
-  const opexCost = p.capex * (p.opex / 100);
+  const opexCost = Math.max(0, p.capex * (p.opex / 100));
   const tot = eSav + hRev + hIS;
   const net = tot - gCost - opexCost;
   const pb = net > 0 ? p.capex / net : null;
