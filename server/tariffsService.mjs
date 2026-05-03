@@ -217,6 +217,28 @@ async function syncFromEnergyMap(localSnapshot) {
   };
 }
 
+async function syncWithFallback(localSnapshot) {
+  try {
+    return await syncFromEnergyMap(localSnapshot);
+  } catch (err) {
+    const message = err?.message || 'Energy Map sync failed';
+    const statusMatch = /HTTP\s+(\d{3})/.exec(message);
+    const status = statusMatch ? Number(statusMatch[1]) : null;
+
+    return {
+      snapshot: localSnapshot,
+      meta: {
+        stale: true,
+        source: 'local-snapshot',
+        fallback: true,
+        reason: status === 429 ? 'rate_limited' : 'sync_error',
+        errorStatus: status,
+        errorMessage: message,
+      },
+    };
+  }
+}
+
 async function getSnapshotInternal({ forceSync = false } = {}) {
   const now = Date.now();
   const localSnapshot = await readLocalSnapshot();
@@ -234,7 +256,7 @@ async function getSnapshotInternal({ forceSync = false } = {}) {
     return response;
   }
 
-  const synced = await syncFromEnergyMap(localSnapshot);
+  const synced = await syncWithFallback(localSnapshot);
   lastSyncAt = now;
   memoryCache = synced;
   return synced;
