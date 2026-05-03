@@ -57,10 +57,41 @@ function parseCsv(text) {
   return lines.map((line) => splitCsvLine(line, delimiter));
 }
 
-function latestNumberFromCsv(text, valueColumnIndex = 1) {
+function normalizeText(value) {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase();
+}
+
+function parseFilterColumn(prefix, key) {
+  const raw = process.env[`${prefix}_${key}_COLUMN`];
+  if (raw == null || String(raw).trim() === '') return null;
+  const num = Number(raw);
+  return Number.isFinite(num) ? num : null;
+}
+
+function parseFilters(prefix) {
+  const filters = [];
+  const keys = ['FILTER', 'FILTER2'];
+  for (const key of keys) {
+    const column = parseFilterColumn(prefix, key);
+    const value = process.env[`${prefix}_${key}_VALUE`];
+    if (column == null || value == null || String(value).trim() === '') continue;
+    filters.push({ column, value: normalizeText(value) });
+  }
+  return filters;
+}
+
+function rowMatchesFilters(row, filters) {
+  if (!filters.length) return true;
+  return filters.every(({ column, value }) => normalizeText(row[column]).includes(value));
+}
+
+function latestNumberFromCsv(text, valueColumnIndex = 1, filters = []) {
   const rows = parseCsv(text);
   for (let i = rows.length - 1; i >= 1; i -= 1) {
     const row = rows[i];
+    if (!rowMatchesFilters(row, filters)) continue;
     const value = toNumber(row[valueColumnIndex]);
     if (value != null) return value;
   }
@@ -109,6 +140,7 @@ async function syncFromEnergyMap(localSnapshot) {
   const rdnUuid = process.env.ENERGYMAP_RDN_UUID;
   const heatUuid = process.env.ENERGYMAP_HEAT_UUID;
   const greenUuid = process.env.ENERGYMAP_GREEN_TARIFF_UUID;
+  const heatManual = toNumber(process.env.ENERGYMAP_HEAT_MANUAL_TARIFF);
 
   if (!token || !gasUuid || !rdnUuid) {
     return {
@@ -121,21 +153,24 @@ async function syncFromEnergyMap(localSnapshot) {
   const rdnColumn = Number(process.env.ENERGYMAP_RDN_VALUE_COLUMN || 1);
   const heatColumn = Number(process.env.ENERGYMAP_HEAT_VALUE_COLUMN || 1);
   const greenColumn = Number(process.env.ENERGYMAP_GREEN_TARIFF_VALUE_COLUMN || 1);
+  const rdnFilters = parseFilters('ENERGYMAP_RDN');
+  const heatFilters = parseFilters('ENERGYMAP_HEAT');
+  const greenFilters = parseFilters('ENERGYMAP_GREEN_TARIFF');
 
   const baseDownloads = [
     fetchEnergyMapCsv({ token, uuid: gasUuid }),
     fetchEnergyMapCsv({ token, uuid: rdnUuid }),
   ];
-  if (heatUuid) baseDownloads.push(fetchEnergyMapCsv({ token, uuid: heatUuid }));
+  if (heatUuid && heatManual == null) baseDownloads.push(fetchEnergyMapCsv({ token, uuid: heatUuid }));
   if (greenUuid) baseDownloads.push(fetchEnergyMapCsv({ token, uuid: greenUuid }));
 
   const downloads = await Promise.all(baseDownloads);
   const [gasCsv, rdnCsv, heatCsv, greenCsv] = downloads;
 
   const gp = latestNumberFromCsv(gasCsv, gasColumn);
-  const rdm = latestNumberFromCsv(rdnCsv, rdnColumn);
-  const hp = heatCsv ? latestNumberFromCsv(heatCsv, heatColumn) : null;
-  const greenTariff = greenCsv ? latestNumberFromCsv(greenCsv, greenColumn) : null;
+  const rdm = latestNumberFromCsv(rdnCsv, rdnColumn, rdnFilters);
+  const hp = heatManual ?? (heatCsv ? latestNumberFromCsv(heatCsv, heatColumn, heatFilters) : null);
+  const greenTariff = greenCsv ? latestNumberFromCsv(greenCsv, greenColumn, greenFilters) : null;
 
   const defaultsPatch = {};
   if (gp != null) defaultsPatch.gp = gp;
@@ -153,7 +188,7 @@ async function syncFromEnergyMap(localSnapshot) {
     ...(localSnapshot.sources || {}),
     gp: 'Energy Map API',
     rdm: 'Energy Map API',
-    ...(hp != null ? { hp: 'Energy Map API' } : {}),
+    ...(hp != null ? { hp: heatManual != null ? 'Manual env override' : 'Energy Map API' } : {}),
     ...(greenTariff != null
       ? {
           solar: {
