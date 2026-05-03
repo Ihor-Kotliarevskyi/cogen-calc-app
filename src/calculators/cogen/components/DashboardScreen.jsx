@@ -1,6 +1,6 @@
-import React from 'react';
-import { useCalc } from '../context/CalcContext.jsx';
-import { fN, fM, fG } from '../lib/calc.js';
+﻿import React from 'react';
+import { useCalc } from '../context/CogenContext.jsx';
+import { fN, fM, fG } from '../../../shared/lib/formatters.js';
 
 export default function DashboardScreen() {
   const { P, result: r } = useCalc();
@@ -100,3 +100,5 @@ export default function DashboardScreen() {
     </div>
   );
 }
+
+

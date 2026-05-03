@@ -1,6 +1,7 @@
-import React from 'react';
-import { useCalc } from '../context/CalcContext.jsx';
-import { calc, fN, fM, fG } from '../lib/calc.js';
+﻿import React from 'react';
+import { useCalc } from '../context/CogenContext.jsx';
+import { calc } from '../lib/calc.js';
+import { fN, fM, fG } from '../../../shared/lib/formatters.js';
 
 export default function ScenariosScreen() {
   const { P, result: r } = useCalc();
@@ -120,3 +121,5 @@ export default function ScenariosScreen() {
     </div>
   );
 }
+
+

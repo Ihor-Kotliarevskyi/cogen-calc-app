@@ -1,6 +1,6 @@
-import React from 'react';
-import { useCalc } from '../context/CalcContext.jsx';
-import { fN } from '../lib/calc.js';
+﻿import React from 'react';
+import { useCalc } from '../context/CogenContext.jsx';
+import { fN } from '../../../shared/lib/formatters.js';
 
 const SLIDERS = {
   // ── Установка КГУ (параметризовані) ──
@@ -204,3 +204,5 @@ export default function ParamsScreen() {
     </div>
   );
 }
+
+

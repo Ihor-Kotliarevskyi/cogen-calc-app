@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useReducer, useMemo, useEffect, useState } from 'react';
+﻿import React, { createContext, useContext, useEffect, useMemo, useReducer, useState } from 'react';
 import { DEF, calc } from '../lib/calc.js';
 import { fetchMarketDefaults } from '../lib/fetchDefaults.js';
-import { loadCurrentState } from '../lib/scenarioStorage.js';
+import { loadCurrentState } from '../../../shared/lib/scenarioStorage.js';
 
-const CalcContext = createContext(null);
+const CogenContext = createContext(null);
 
 function reducer(state, action) {
   switch (action.type) {
@@ -20,33 +20,27 @@ function reducer(state, action) {
   }
 }
 
-export function CalcProvider({ children }) {
+export function CogenProvider({ children }) {
   const [P, dispatch] = useReducer(reducer, { ...DEF });
   const [marketMeta, setMarketMeta] = useState({ updated: null, region: null, sources: {} });
   const [marketDefaults, setMarketDefaults] = useState({ ...DEF });
   const [loading, setLoading] = useState(true);
   const result = useMemo(() => calc(P), [P]);
 
-  // On mount: (1) try localStorage, (2) fetch market data, (3) fallback to DEF
   useEffect(() => {
     let cancelled = false;
 
     async function init() {
-      // First try to restore saved state
-      const saved = loadCurrentState();
-      if (saved) {
-        if (!cancelled) {
-          dispatch({ type: 'LOAD_STATE', state: saved });
-        }
+      const saved = loadCurrentState('cogen');
+      if (saved && !cancelled) {
+        dispatch({ type: 'LOAD_STATE', state: saved });
       }
 
-      // Always fetch market defaults (for reset + meta display)
       const { defaults, meta } = await fetchMarketDefaults();
       if (!cancelled) {
         setMarketDefaults(defaults);
         setMarketMeta(meta);
 
-        // If no saved state, use market defaults
         if (!saved) {
           dispatch({ type: 'LOAD_STATE', state: defaults });
         }
@@ -56,23 +50,25 @@ export function CalcProvider({ children }) {
     }
 
     init();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // Reset now uses market defaults instead of hardcoded DEF
   const resetToDefaults = () => {
     dispatch({ type: 'RESET', defaults: marketDefaults });
   };
 
   return (
-    <CalcContext.Provider value={{ P, result, dispatch, marketMeta, marketDefaults, resetToDefaults, loading }}>
+    <CogenContext.Provider value={{ P, result, dispatch, marketMeta, marketDefaults, resetToDefaults, loading }}>
       {children}
-    </CalcContext.Provider>
+    </CogenContext.Provider>
   );
 }
 
 export function useCalc() {
-  const ctx = useContext(CalcContext);
-  if (!ctx) throw new Error('useCalc must be used within CalcProvider');
+  const ctx = useContext(CogenContext);
+  if (!ctx) throw new Error('useCalc must be used within CogenProvider');
   return ctx;
 }
+

@@ -1,56 +1,95 @@
-import React, { useState } from 'react';
-import Header from './components/Header.jsx';
-import TabBar from './components/TabBar.jsx';
-import ParamsScreen from './components/ParamsScreen.jsx';
-import DashboardScreen from './components/DashboardScreen.jsx';
-import BalanceScreen from './components/BalanceScreen.jsx';
-import CashflowScreen from './components/CashflowScreen.jsx';
-import ScenariosScreen from './components/ScenariosScreen.jsx';
-import SavedScenariosScreen from './components/SavedScenariosScreen.jsx';
-import { useCalc } from './context/CalcContext.jsx';
-import { useAutoSave } from './hooks/useAutoSave.js';
-import { CALC_MODES } from './lib/calcModes.js';
+﻿import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import CogenCalculator from './calculators/cogen/index.jsx';
+import SolarCalculator from './calculators/solar/index.jsx';
 
-const TABS = [
-  { key: 'params',  label: 'Параметри' },
-  { key: 'dash',    label: 'Результат' },
-  { key: 'balance', label: 'Баланси' },
-  { key: 'cf',      label: 'CF / Графік' },
-  { key: 'sc',      label: 'Сценарії' },
-  { key: 'saved',   label: 'Збережені' },
-];
+const MODES = ['cogen', 'solar'];
 
+function readModeFromUrl() {
+  const mode = new URLSearchParams(window.location.search).get('mode');
+  if (!mode) return null;
+  return MODES.includes(mode) ? mode : null;
+}
 
+function setModeInUrl(mode) {
+  const url = new URL(window.location.href);
+  if (mode) {
+    url.searchParams.set('mode', mode);
+  } else {
+    url.searchParams.delete('mode');
+  }
+  window.history.pushState({}, '', url);
+}
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('params');
-  const [calcMode, setCalcMode] = useState('cogen');
-  const { P, loading } = useCalc();
+  const [mode, setMode] = useState(() => readModeFromUrl());
 
-  useAutoSave(P);
+  useEffect(() => {
+    const onPopState = () => setMode(readModeFromUrl());
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
-  if (loading) {
+  const selectMode = useCallback((nextMode) => {
+    setMode(nextMode);
+    setModeInUrl(nextMode);
+  }, []);
+
+  const clearMode = useCallback(() => {
+    setMode(null);
+    setModeInUrl(null);
+  }, []);
+
+  const landingCards = useMemo(
+    () => [
+      {
+        key: 'cogen',
+        title: '🔥 КГУ',
+        subtitle: 'Когенерація',
+        available: true,
+      },
+      {
+        key: 'solar',
+        title: '☀️ СЕС',
+        subtitle: 'Сонячна електростанція',
+        available: true,
+      },
+    ],
+    []
+  );
+
+  if (!mode) {
     return (
-      <div className="app" style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <div style={{ color: 'var(--text2)', fontSize: 'var(--fs-base)' }}>
-          Завантаження ринкових даних…
+      <div className="app" style={{ justifyContent: 'center', alignItems: 'center', padding: '24px' }}>
+        <div className="card" style={{ width: '100%', maxWidth: '920px' }}>
+          <div className="scr-title" style={{ marginBottom: '18px' }}>Калькулятор окупності енергетики</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+            {landingCards.map((card) => (
+              <button
+                key={card.key}
+                className="card"
+                style={{ textAlign: 'left', cursor: card.available ? 'pointer' : 'not-allowed', opacity: card.available ? 1 : 0.6 }}
+                onClick={() => card.available && selectMode(card.key)}
+                disabled={!card.available}
+              >
+                <div style={{ fontWeight: 700, marginBottom: '4px' }}>{card.title}</div>
+                <div style={{ color: 'var(--text2)' }}>{card.subtitle}</div>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="app">
-      <Header calcMode={calcMode} onModeChange={setCalcMode} />
-      <TabBar tabs={TABS} active={activeTab} onChange={setActiveTab} />
-      <div className="content">
-        {activeTab === 'params'  && <ParamsScreen />}
-        {activeTab === 'dash'    && <DashboardScreen />}
-        {activeTab === 'balance' && <BalanceScreen />}
-        {activeTab === 'cf'      && <CashflowScreen />}
-        {activeTab === 'sc'      && <ScenariosScreen />}
-        {activeTab === 'saved'   && <SavedScenariosScreen />}
-      </div>
-    </div>
-  );
+  if (mode === 'cogen') {
+    return <CogenCalculator calcMode={mode} onModeChange={selectMode} />;
+  }
+
+  if (mode === 'solar') {
+    return <SolarCalculator calcMode={mode} onModeChange={selectMode} />;
+  }
+
+  return null;
 }
+
+

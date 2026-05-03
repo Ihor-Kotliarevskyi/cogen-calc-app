@@ -1,5 +1,6 @@
-import React from 'react';
-import { calc, fN, fM, fG } from '../lib/calc.js';
+﻿import React from 'react';
+import { calc } from '../lib/calc.js';
+import { fN, fM, fG } from '../../../shared/lib/formatters.js';
 
 export default function PrintReport({ scenario }) {
   const { P, metrics } = scenario;
@@ -119,3 +120,5 @@ export default function PrintReport({ scenario }) {
     </div>
   );
 }
+
+

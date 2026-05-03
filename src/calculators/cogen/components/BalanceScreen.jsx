@@ -1,6 +1,6 @@
-import React from 'react';
-import { useCalc } from '../context/CalcContext.jsx';
-import { fN } from '../lib/calc.js';
+﻿import React from 'react';
+import { useCalc } from '../context/CogenContext.jsx';
+import { fN } from '../../../shared/lib/formatters.js';
 
 export default function BalanceScreen() {
   const { P, result: r } = useCalc();
@@ -130,3 +130,5 @@ export default function BalanceScreen() {
     </div>
   );
 }
+
+

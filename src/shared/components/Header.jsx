@@ -1,36 +1,21 @@
-import React from 'react';
-import { useCalc } from '../context/CalcContext.jsx';
-import { fN } from '../lib/calc.js';
-import { CALC_MODES } from '../lib/calcModes.js';
+﻿import React from 'react';
 
-export default function Header({ calcMode, onModeChange }) {
-  const { P, result, marketMeta } = useCalc();
-
-  const sourceLabel = marketMeta.updated
-    ? `оновлено ${marketMeta.updated}`
-    : 'дефолтні дані';
-
+export default function Header({ calcMode, onModeChange, modes, brand, subtitle, sourceLabel }) {
   return (
     <div className="hdr">
       <div className="hdr-inner">
-
-        {/* ── Бренд ── */}
         <div className="hdr-brand">
           <div className="hdr-brand-name">
             <span className="hdr-brand-icon">⚡</span>
-            EnergyROI
+            {brand}
           </div>
           <div className="hdr-brand-sub">
-            <b>{P.projectName}</b> · {fN(result.h)} год/рік · КГУ {P.elMW} МВт
-            {marketMeta.region && (
-              <span className="hdr-region"> · {marketMeta.region}</span>
-            )}
+            <b>{subtitle}</b>
           </div>
         </div>
 
-        {/* ── Перемикач режиму ── */}
         <div className="mode-switcher">
-          {CALC_MODES.map((m) => (
+          {modes.map((m) => (
             <button
               key={m.key}
               className={`mode-btn${calcMode === m.key ? ' active' : ''}${!m.available ? ' disabled' : ''}`}
@@ -45,12 +30,10 @@ export default function Header({ calcMode, onModeChange }) {
           ))}
         </div>
 
-        {/* ── Live статус ── */}
         <div className="live">
           <div className="live-dot"></div>
           <span className="live-label">{sourceLabel}</span>
         </div>
-
       </div>
     </div>
   );

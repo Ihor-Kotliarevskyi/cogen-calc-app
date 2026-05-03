@@ -1,4 +1,4 @@
-import { DEF } from './calc.js';
+﻿import { DEF } from './calc.js';
 
 /**
  * Fetch market defaults from market-data.json.
@@ -26,3 +26,5 @@ export async function fetchMarketDefaults() {
     };
   }
 }
+
+

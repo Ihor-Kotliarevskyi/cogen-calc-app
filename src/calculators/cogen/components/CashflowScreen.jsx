@@ -1,6 +1,7 @@
-import React, { useRef, useEffect } from 'react';
-import { useCalc } from '../context/CalcContext.jsx';
-import { calc, fN } from '../lib/calc.js';
+﻿import React, { useRef, useEffect } from 'react';
+import { useCalc } from '../context/CogenContext.jsx';
+import { calc } from '../lib/calc.js';
+import { fN } from '../../../shared/lib/formatters.js';
 
 function drawChart(canvas, cf) {
   const wrap = canvas.parentElement;
@@ -211,3 +212,5 @@ export default function CashflowScreen() {
     </div>
   );
 }
+
+
