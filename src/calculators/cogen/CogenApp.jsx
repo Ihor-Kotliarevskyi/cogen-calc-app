@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { useCalc } from './context/CogenContext.jsx';
 import Header from '../../shared/components/Header.jsx';
 import TabBar from '../../shared/components/TabBar.jsx';
@@ -10,7 +10,6 @@ import CashflowScreen from './components/CashflowScreen.jsx';
 import ScenariosScreen from './components/ScenariosScreen.jsx';
 import SavedScenariosScreen from './components/SavedScenariosScreen.jsx';
 import { CALC_MODES } from '../../lib/calcModes.js';
-import { fN } from '../../shared/lib/formatters.js';
 
 const TABS = [
   { key: 'params', label: 'Параметри' },
@@ -23,14 +22,10 @@ const TABS = [
 
 export default function CogenApp({ calcMode, onModeChange }) {
   const [activeTab, setActiveTab] = useState('params');
-  const { P, result, marketMeta, loading } = useCalc();
+  const { P, loading } = useCalc();
 
   useAutoSave(P, 'cogen');
-
-  const subtitle = useMemo(() => {
-    const region = marketMeta.region ? ` · ${marketMeta.region}` : '';
-    return `${P.projectName} · ${fN(result.h)} год/рік · КГУ ${P.elMW} МВт${region}`;
-  }, [P.projectName, P.elMW, result.h, marketMeta.region]);
+  const subtitle = useMemo(() => 'Когенераційний модуль', []);
 
   if (loading) {
     return (
@@ -42,14 +37,7 @@ export default function CogenApp({ calcMode, onModeChange }) {
 
   return (
     <div className="app">
-      <Header
-        calcMode={calcMode}
-        onModeChange={onModeChange}
-        modes={CALC_MODES}
-        brand="EnergyROI"
-        subtitle={subtitle}
-        sourceLabel={marketMeta.updated ? `оновлено ${marketMeta.updated}` : 'дефолтні дані'}
-      />
+      <Header calcMode={calcMode} onModeChange={onModeChange} modes={CALC_MODES} subtitle={subtitle} />
       <TabBar tabs={TABS} active={activeTab} onChange={setActiveTab} />
       <div className="content">
         {activeTab === 'params' && <ParamsScreen />}
@@ -62,4 +50,3 @@ export default function CogenApp({ calcMode, onModeChange }) {
     </div>
   );
 }
-

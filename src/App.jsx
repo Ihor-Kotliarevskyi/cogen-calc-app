@@ -34,25 +34,10 @@ export default function App() {
     setModeInUrl(nextMode);
   }, []);
 
-  const clearMode = useCallback(() => {
-    setMode(null);
-    setModeInUrl(null);
-  }, []);
-
   const landingCards = useMemo(
     () => [
-      {
-        key: 'cogen',
-        title: '🔥 КГУ',
-        subtitle: 'Когенерація',
-        available: true,
-      },
-      {
-        key: 'solar',
-        title: '☀️ СЕС',
-        subtitle: 'Сонячна електростанція',
-        available: true,
-      },
+      { key: 'cogen', title: 'КГУ', subtitle: 'Когенерація', available: true },
+      { key: 'solar', title: 'СЕС', subtitle: 'Сонячна електростанція', available: true },
     ],
     []
   );
@@ -81,15 +66,7 @@ export default function App() {
     );
   }
 
-  if (mode === 'cogen') {
-    return <CogenCalculator calcMode={mode} onModeChange={selectMode} />;
-  }
-
-  if (mode === 'solar') {
-    return <SolarCalculator calcMode={mode} onModeChange={selectMode} />;
-  }
-
+  if (mode === 'cogen') return <CogenCalculator calcMode={mode} onModeChange={selectMode} />;
+  if (mode === 'solar') return <SolarCalculator calcMode={mode} onModeChange={selectMode} />;
   return null;
 }
-
-

@@ -1,17 +1,15 @@
 ﻿import React from 'react';
 
-export default function Header({ calcMode, onModeChange, modes, brand, subtitle, sourceLabel }) {
+export default function Header({ calcMode, onModeChange, modes, subtitle }) {
   return (
     <div className="hdr">
       <div className="hdr-inner">
         <div className="hdr-brand">
           <div className="hdr-brand-name">
-            <span className="hdr-brand-icon">⚡</span>
-            {brand}
+            <span className="brand-logo" aria-hidden="true"><span>ER</span></span>
+            <span className="brand-text">EnergyROI</span>
           </div>
-          <div className="hdr-brand-sub">
-            <b>{subtitle}</b>
-          </div>
+          <div className="hdr-brand-sub">{subtitle}</div>
         </div>
 
         <div className="mode-switcher">
@@ -28,11 +26,6 @@ export default function Header({ calcMode, onModeChange, modes, brand, subtitle,
               {!m.available && <span className="mode-btn-soon">soon</span>}
             </button>
           ))}
-        </div>
-
-        <div className="live">
-          <div className="live-dot"></div>
-          <span className="live-label">{sourceLabel}</span>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
-/* ── Google Fonts ── */
+﻿/* в”Ђв”Ђ Google Fonts в”Ђв”Ђ */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* ── Design tokens ── */
+/* в”Ђв”Ђ Design tokens в”Ђв”Ђ */
 :root {
   /* Backgrounds */
   --bg:      #f0f2f5;
@@ -18,7 +18,7 @@
   --text2:   #4b5563;
   --text3:   #9ca3af;
 
-  /* Accent colours — richer, higher contrast */
+  /* Accent colours вЂ” richer, higher contrast */
   --green:    #059669;
   --green-bg: #d1fae5;
   --red:      #dc2626;
@@ -32,7 +32,7 @@
   --safe-top:    env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
-  /* Typography scale — mobile-first */
+  /* Typography scale вЂ” mobile-first */
   --fs-xs:   13px;
   --fs-sm:   14px;
   --fs-base: 15px;
@@ -42,7 +42,7 @@
   --fs-2xl:  26px;
 }
 
-/* ── Tablet 768+ ── */
+/* в”Ђв”Ђ Tablet 768+ в”Ђв”Ђ */
 @media (min-width: 768px) {
   :root {
     --fs-xs:   14px;
@@ -55,7 +55,7 @@
   }
 }
 
-/* ── Desktop 1280+ ── */
+/* в”Ђв”Ђ Desktop 1280+ в”Ђв”Ђ */
 @media (min-width: 1280px) {
   :root {
     --fs-xs:   14px;
@@ -68,7 +68,7 @@
   }
 }
 
-/* ── Reset & Base ── */
+/* в”Ђв”Ђ Reset & Base в”Ђв”Ђ */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -88,7 +88,7 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── App shell ── */
+/* в”Ђв”Ђ App shell в”Ђв”Ђ */
 .app {
   display: flex;
   flex-direction: column;
@@ -96,7 +96,7 @@ html, body {
   padding-top: var(--safe-top);
 }
 
-/* ── Header ── */
+/* в”Ђв”Ђ Header в”Ђв”Ђ */
 .hdr {
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
@@ -104,13 +104,14 @@ html, body {
   box-shadow: 0 1px 4px rgba(0,0,0,0.07);
 }
 
-/* ── Brand block ── */
+/* в”Ђв”Ђ Brand block в”Ђв”Ђ */
 .hdr-brand {
   min-width: 0;
   flex: 1;
 }
 
 .hdr-brand-name {
+  gap: 10px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -135,7 +136,7 @@ html, body {
   text-overflow: ellipsis;
 }
 
-/* ── Mode switcher (КГУ / СЕС) ── */
+/* в”Ђв”Ђ Mode switcher (РљР“РЈ / РЎР•РЎ) в”Ђв”Ђ */
 .mode-switcher {
   display: flex;
   gap: 4px;
@@ -207,32 +208,7 @@ html, body {
   .mode-btn { padding: 6px 8px; }
 }
 
-.live {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: var(--fs-xs);
-  color: var(--green);
-  font-weight: 500;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.live-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--green);
-  animation: blink 2s infinite;
-  flex-shrink: 0;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.3; }
-}
-
-/* ── Tab bar ── */
+/* в”Ђв”Ђ Tab bar в”Ђв”Ђ */
 .tabbar {
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
@@ -268,7 +244,7 @@ html, body {
   font-weight: 600;
 }
 
-/* ── Scroll area ── */
+/* в”Ђв”Ђ Scroll area в”Ђв”Ђ */
 .content {
   flex: 1;
   overflow-y: auto;
@@ -276,7 +252,7 @@ html, body {
   background: var(--bg);
 }
 
-/* ── Global page container (max 1440) ── */
+/* в”Ђв”Ђ Global page container (max 1440) в”Ђв”Ђ */
 .page-wrap {
   width: 100%;
   max-width: 1440px;
@@ -301,7 +277,7 @@ html, body {
 @media (min-width: 768px)  { .screen { padding: 24px 0; } }
 @media (min-width: 1280px) { .screen { padding: 32px 0; } }
 
-/* ── Header & TabBar inner wrappers (max-width 1440) ── */
+/* в”Ђв”Ђ Header & TabBar inner wrappers (max-width 1440) в”Ђв”Ђ */
 .hdr-inner,
 .tabbar-inner {
   width: 100%;
@@ -331,7 +307,7 @@ html, body {
 
 .tabbar-inner::-webkit-scrollbar { display: none; }
 
-/* ── Params two-column grid (tablet+) ── */
+/* в”Ђв”Ђ Params two-column grid (tablet+) в”Ђв”Ђ */
 .params-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -344,16 +320,16 @@ html, body {
     gap: 0 24px;
     align-items: start;
   }
-  /* Explicit placement: top row = Ціни (L) + Інвестиції (R) */
+  /* Explicit placement: top row = Р¦С–РЅРё (L) + Р†РЅРІРµСЃС‚РёС†С–С— (R) */
   .params-prices { grid-column: 1; grid-row: 1; }
   .params-inv    { grid-column: 2; grid-row: 1; }
-  /* Bottom row = Електрика (L) + Тепло (R) */
+  /* Bottom row = Р•Р»РµРєС‚СЂРёРєР° (L) + РўРµРїР»Рѕ (R) */
   .params-el     { grid-column: 1; grid-row: 2; }
   .params-heat   { grid-column: 2; grid-row: 2; }
 }
 
-/* ── Generic two-column grid (tablet+) ── */
-/* Used by: Результат, Баланси, CF/Графік */
+/* в”Ђв”Ђ Generic two-column grid (tablet+) в”Ђв”Ђ */
+/* Used by: Р РµР·СѓР»СЊС‚Р°С‚, Р‘Р°Р»Р°РЅСЃРё, CF/Р“СЂР°С„С–Рє */
 .two-col-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -368,7 +344,7 @@ html, body {
   }
 }
 
-/* ── Scenario cards 2×2 grid (tablet+) ── */
+/* в”Ђв”Ђ Scenario cards 2Г—2 grid (tablet+) в”Ђв”Ђ */
 .sc-cards-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -387,7 +363,7 @@ html, body {
   }
 }
 
-/* ── Section titles ── */
+/* в”Ђв”Ђ Section titles в”Ђв”Ђ */
 .sec {
   font-size: var(--fs-xs);
   font-weight: 600;
@@ -401,7 +377,7 @@ html, body {
 
 .sec:first-child { margin-top: 0; }
 
-/* ── Cards ── */
+/* в”Ђв”Ђ Cards в”Ђв”Ђ */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -411,7 +387,7 @@ html, body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 
-/* ── Metric grid ── */
+/* в”Ђв”Ђ Metric grid в”Ђв”Ђ */
 .mg {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -458,7 +434,7 @@ html, body {
 .ca { color: var(--amber) !important; }
 .cb { color: var(--blue)  !important; }
 
-/* ── Slider rows ── */
+/* в”Ђв”Ђ Slider rows в”Ђв”Ђ */
 .sr { margin-bottom: 18px; }
 .sr:last-child { margin-bottom: 0; }
 
@@ -521,7 +497,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   transform: scale(1.15);
 }
 
-/* ── Derived box ── */
+/* в”Ђв”Ђ Derived box в”Ђв”Ђ */
 .derived {
   display: flex;
   justify-content: space-between;
@@ -545,7 +521,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   color: var(--blue);
 }
 
-/* ── Segment control ── */
+/* в”Ђв”Ђ Segment control в”Ђв”Ђ */
 .segs {
   display: flex;
   gap: 6px;
@@ -577,7 +553,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   color: #fff;
 }
 
-/* ── P&L table ── */
+/* в”Ђв”Ђ P&L table в”Ђв”Ђ */
 .pnl-row {
   display: flex;
   align-items: center;
@@ -625,7 +601,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   flex-shrink: 0;
 }
 
-/* ── Balance table ── */
+/* в”Ђв”Ђ Balance table в”Ђв”Ђ */
 .bt {
   width: 100%;
   border-collapse: collapse;
@@ -665,7 +641,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   border-bottom: none;
 }
 
-/* ── Info boxes ── */
+/* в”Ђв”Ђ Info boxes в”Ђв”Ђ */
 .ib {
   border-radius: 10px;
   padding: 12px 16px;
@@ -689,7 +665,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   color: #78350f;
 }
 
-/* ── Scenario cards ── */
+/* в”Ђв”Ђ Scenario cards в”Ђв”Ђ */
 .sc-badge {
   display: inline-block;
   font-size: 12px;
@@ -724,7 +700,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   border-width: 2px !important;
 }
 
-/* ── CF table ── */
+/* в”Ђв”Ђ CF table в”Ђв”Ђ */
 .cf-row {
   display: flex;
   align-items: center;
@@ -758,7 +734,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   flex-shrink: 0;
 }
 
-/* ── Sensitivity table ── */
+/* в”Ђв”Ђ Sensitivity table в”Ђв”Ђ */
 .st {
   width: 100%;
   border-collapse: collapse;
@@ -791,7 +767,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   font-weight: 400;
 }
 
-/* ── Chart ── */
+/* в”Ђв”Ђ Chart в”Ђв”Ђ */
 .chart-wrap {
   position: relative;
   width: 100%;
@@ -810,7 +786,7 @@ canvas {
   height: 100%;
 }
 
-/* ── Misc ── */
+/* в”Ђв”Ђ Misc в”Ђв”Ђ */
 .title-row {
   display: flex;
   justify-content: space-between;
@@ -864,17 +840,7 @@ canvas {
   color: var(--text);
 }
 
-/* ── Header extras ── */
-.hdr-region {
-  color: var(--blue);
-  font-weight: 600;
-}
-
-.live-label {
-  font-size: var(--fs-xs);
-}
-
-/* ── Saved scenarios ── */
+/* в”Ђв”Ђ Saved scenarios в”Ђв”Ђ */
 .save-modal { margin-bottom: 16px; }
 
 .save-input {
@@ -1028,7 +994,7 @@ canvas {
   color: var(--red);
 }
 
-/* ── Мінімальна ширина для малих екранів ── */
+/* в”Ђв”Ђ РњС–РЅС–РјР°Р»СЊРЅР° С€РёСЂРёРЅР° РґР»СЏ РјР°Р»РёС… РµРєСЂР°РЅС–РІ в”Ђв”Ђ */
 @media (max-width: 378px) {
   .mg { grid-template-columns: 1fr 1fr; gap: 8px; }
   .m { padding: 12px; }
@@ -1038,7 +1004,7 @@ canvas {
   .btn-export { flex: 1 1 calc(50% - 4px); }
 }
 
-/* ── Print report ── */
+/* в”Ђв”Ђ Print report в”Ђв”Ђ */
 .print-report { display: none; }
 
 @media print {
@@ -1131,3 +1097,25 @@ canvas {
     color: #aaa;
   }
 }
+
+
+.brand-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1d4ed8, #0b3aa8);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+}
+
+.brand-text {
+  letter-spacing: -0.3px;
+}
+
+

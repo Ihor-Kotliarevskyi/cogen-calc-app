@@ -4,7 +4,6 @@ import TabBar from '../../shared/components/TabBar.jsx';
 import { CALC_MODES } from '../../lib/calcModes.js';
 import { useSolar } from './context/SolarContext.jsx';
 import { useAutoSave } from '../../shared/hooks/useAutoSave.js';
-import { fN } from '../../shared/lib/formatters.js';
 import SolarParamsScreen from './components/SolarParamsScreen.jsx';
 import SolarDashboardScreen from './components/SolarDashboardScreen.jsx';
 import SolarGenerationScreen from './components/SolarGenerationScreen.jsx';
@@ -23,14 +22,10 @@ const TABS = [
 
 export default function SolarApp({ calcMode, onModeChange }) {
   const [activeTab, setActiveTab] = useState('params');
-  const { P, result, marketMeta, loading } = useSolar();
+  const { P, loading } = useSolar();
 
   useAutoSave(P, 'solar');
-
-  const subtitle = useMemo(() => {
-    const region = marketMeta.region ? ` · ${marketMeta.region}` : '';
-    return `${P.projectName} · ${fN(result.year1Gen, 0)} кВт·год/рік · СЕС ${P.pvMW} МВт${region}`;
-  }, [P.projectName, P.pvMW, result.year1Gen, marketMeta.region]);
+  const subtitle = useMemo(() => 'Сонячний модуль', []);
 
   if (loading) {
     return (
@@ -42,14 +37,7 @@ export default function SolarApp({ calcMode, onModeChange }) {
 
   return (
     <div className="app">
-      <Header
-        calcMode={calcMode}
-        onModeChange={onModeChange}
-        modes={CALC_MODES}
-        brand="EnergyROI"
-        subtitle={subtitle}
-        sourceLabel={marketMeta.updated ? `оновлено ${marketMeta.updated}` : 'дефолтні дані'}
-      />
+      <Header calcMode={calcMode} onModeChange={onModeChange} modes={CALC_MODES} subtitle={subtitle} />
       <TabBar tabs={TABS} active={activeTab} onChange={setActiveTab} />
       <div className="content">
         {activeTab === 'params' && <SolarParamsScreen />}

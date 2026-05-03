@@ -131,9 +131,9 @@ export default function SavedScenariosScreen() {
                     <div className="sc-saved-date">{fDate(s.timestamp)}</div>
                   </div>
                   <div style={{ display: 'flex', gap: 4 }}>
-                    <button className="btn-icon" title="Завантажити" onClick={() => handleLoad(s)}>📥</button>
-                    <button className="btn-icon" title="Друк" onClick={() => handlePrint(s)}>🖨</button>
-                    <button className="btn-icon btn-icon-danger" title="Видалити" onClick={() => handleDelete(s.id)}>🗑</button>
+                    <button className="btn-icon" title="Завантажити" onClick={() => handleLoad(s)}>DL</button>
+                    <button className="btn-icon" title="Друк" onClick={() => handlePrint(s)}>PR</button>
+                    <button className="btn-icon btn-icon-danger" title="Видалити" onClick={() => handleDelete(s.id)}>RM</button>
                   </div>
                 </div>
                 <div className="sc-saved-metrics">
@@ -149,3 +149,4 @@ export default function SavedScenariosScreen() {
     </div>
   );
 }
+

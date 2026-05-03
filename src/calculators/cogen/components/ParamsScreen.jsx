@@ -90,7 +90,7 @@ function SliderGroup({ sliders, P, onChange, extra }) {
 }
 
 export default function ParamsScreen() {
-  const { P, dispatch, resetToDefaults } = useCalc();
+  const { P, dispatch, resetToDefaults, marketMeta } = useCalc();
 
   const onChange = (key, value) => dispatch({ type: 'SET_PARAM', key, value });
   const setSH = (v) => dispatch({ type: 'SET_SH', value: v });
@@ -170,6 +170,14 @@ export default function ParamsScreen() {
               }}
             />
           </div>
+          <div className="derived" style={{ marginTop: 12 }}>
+            <span className="d-label">Тип установки</span>
+            <span className="d-val">КГУ · {P.elMW.toFixed(1)} / {P.thMW.toFixed(1)} МВт</span>
+          </div>
+          <div className="derived" style={{ marginTop: 8 }}>
+            <span className="d-label">Регіон / оновлення даних</span>
+            <span className="d-val">{marketMeta.region || '—'} · {marketMeta.updated || '—'}</span>
+          </div>
         </div>
 
         {/* ── Установка КГУ (full width) ── */}
@@ -204,5 +212,6 @@ export default function ParamsScreen() {
     </div>
   );
 }
+
 
 

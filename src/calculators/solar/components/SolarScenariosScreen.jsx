@@ -20,7 +20,7 @@ export default function SolarScenariosScreen() {
             dispatch({ type: 'SET_PARAM', key: 'selfUseShare', value: 0.8 });
             dispatch({ type: 'SET_PARAM', key: 'degradation', value: 0.6 });
           }}>
-            <div className="sc-title">Self-use фокус</div>
+            <div className="sc-title">Фокус на self-use</div>
             <div className="sc-row">Більше власного споживання</div>
           </button>
           <button className="card" onClick={() => {
@@ -35,3 +35,4 @@ export default function SolarScenariosScreen() {
     </div>
   );
 }
+

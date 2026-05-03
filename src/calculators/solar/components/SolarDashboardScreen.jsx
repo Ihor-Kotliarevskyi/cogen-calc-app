@@ -1,20 +1,70 @@
 ﻿import React from 'react';
 import { useSolar } from '../context/SolarContext.jsx';
-import { fN, fM, fG } from '../../../shared/lib/formatters.js';
+import { fM, fN, fG } from '../../../shared/lib/formatters.js';
 
 export default function SolarDashboardScreen() {
-  const { result } = useSolar();
+  const { P, result: r } = useSolar();
+
+  const pbCls = r.pb ? (r.pb < 5 ? 'cg' : r.pb < 8 ? 'ca' : 'cr') : 'cr';
+  const rows = [
+    { n: 'Економія на власному споживанні', v: r.savings, pos: true },
+    { n: 'Продаж електроенергії в мережу', v: r.exportRevenue, pos: true },
+    { n: 'РАЗОМ ДОХОДИ', v: r.totalRevenue, pos: true, tot: true },
+    { n: 'OPEX', v: -r.opexCost, pos: false },
+    { n: 'ЧИСТИЙ ПРИБУТОК', v: r.net, pos: r.net > 0, tot: true },
+  ];
 
   return (
     <div className="screen active">
       <div className="page-wrap">
-        <div className="scr-title" style={{ marginBottom: 14 }}>Результат СЕС</div>
-        <div className="sc-cards-grid">
-          <div className="card"><div className="metric-title">Генерація 1-го року</div><div className="metric-val">{fN(result.year1Gen, 0)} кВт·год</div></div>
-          <div className="card"><div className="metric-title">Річний дохід</div><div className="metric-val">{fM(result.totalRevenue, 2)}</div></div>
-          <div className="card"><div className="metric-title">Чистий потік</div><div className="metric-val">{fM(result.net, 2)}</div></div>
-          <div className="card"><div className="metric-title">Окупність</div><div className="metric-val">{result.pb ? `${result.pb.toFixed(1)} р.` : '∞'}</div></div>
-          <div className="card"><div className="metric-title">LCOE</div><div className="metric-val">{fG(result.lcoe, 2)}/кВт·год</div></div>
+        <div className="mg">
+          <div className="m">
+            <div className="ml">генерація / рік</div>
+            <div className="mv cb">{fN(r.year1Gen, 0)}</div>
+            <div className="ms">кВт·год (1-й рік)</div>
+          </div>
+          <div className="m">
+            <div className="ml">окупність</div>
+            <div className={`mv ${pbCls}`}>{r.pb ? `${r.pb.toFixed(1)} р.` : '∞'}</div>
+            <div className="ms">CAPEX {fM(P.capex, 1)}</div>
+          </div>
+          <div className="m">
+            <div className="ml">дохід / рік</div>
+            <div className="mv cb">{fM(r.totalRevenue, 2)}</div>
+            <div className="ms">економія + продаж</div>
+          </div>
+          <div className="m">
+            <div className="ml">LCOE</div>
+            <div className="mv">{fG(r.lcoe, 2)}</div>
+            <div className="ms">грн/кВт·год</div>
+          </div>
+        </div>
+
+        <div className="two-col-grid">
+          <div>
+            <div className="sec">P&L — доходи та витрати</div>
+            <div className="card">
+              {rows.map((row, i) => (
+                <div key={i} className={`pnl-row${row.tot ? ' tot' : ''}`}>
+                  <span className="pnl-n">{row.n}</span>
+                  <span className="pnl-v" style={{ color: row.pos ? 'var(--green)' : 'var(--red)' }}>
+                    {row.v >= 0 ? '+' : ''}{fM(row.v, 2)}
+                  </span>
+                  {!row.tot && <span className="pnl-pct">{fN((Math.abs(row.v) / r.totalRevenue) * 100, 0)}%</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <div className="sec">Енергетичні показники</div>
+            <div className="card">
+              <div className="det-row"><span className="det-k">Власне споживання</span><span className="det-v">{fN(r.selfUseKwh, 0)} кВт·год</span></div>
+              <div className="det-row"><span className="det-k">Експорт у мережу</span><span className="det-v">{fN(r.exportKwh, 0)} кВт·год</span></div>
+              <div className="det-row"><span className="det-k">Ціна заміщення</span><span className="det-v">{P.gridPrice.toFixed(2)} грн/кВт·год</span></div>
+              <div className="det-row"><span className="det-k">Тариф продажу</span><span className="det-v">{P.feedInTariff.toFixed(2)} грн/кВт·год</span></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
