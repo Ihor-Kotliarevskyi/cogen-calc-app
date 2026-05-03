@@ -104,28 +104,107 @@ html, body {
   box-shadow: 0 1px 4px rgba(0,0,0,0.07);
 }
 
-.hdr-left {
+/* ── Brand block ── */
+.hdr-brand {
   min-width: 0;
   flex: 1;
 }
 
-.hdr-left h1 {
+.hdr-brand-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: var(--fs-lg);
   font-weight: 700;
   color: var(--text);
-  letter-spacing: -0.3px;
+  letter-spacing: -0.4px;
+  white-space: nowrap;
+}
+
+.hdr-brand-icon {
+  font-size: var(--fs-md);
+  line-height: 1;
+}
+
+.hdr-brand-sub {
+  font-size: var(--fs-xs);
+  color: var(--text2);
+  margin-top: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.hdr-left p {
-  font-size: var(--fs-xs);
+/* ── Mode switcher (КГУ / СЕС) ── */
+.mode-switcher {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--bg);
+  font-size: var(--fs-sm);
+  font-weight: 500;
   color: var(--text2);
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.mode-btn:hover:not(.disabled) {
+  background: var(--bg2);
+  color: var(--text);
+  border-color: var(--border2);
+}
+
+.mode-btn.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.mode-btn.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.mode-btn-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.mode-btn-label {
+  font-weight: 600;
+}
+
+.mode-btn-soon {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(0,0,0,0.12);
+  color: inherit;
+  margin-left: 2px;
+}
+
+.mode-btn.active .mode-btn-soon {
+  background: rgba(255,255,255,0.25);
+}
+
+/* Hide label on very small screens, keep icon */
+@media (max-width: 377px) {
+  .mode-btn-label { display: none; }
+  .mode-btn { padding: 6px 8px; }
 }
 
 .live {

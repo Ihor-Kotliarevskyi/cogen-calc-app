@@ -1,11 +1,11 @@
 {
-  "name": "КГУ Калькулятор",
-  "short_name": "КГУ",
-  "description": "Фінансова модель когенераційної установки 1 МВт",
+  "name": "EnergyROI",
+  "short_name": "EnergyROI",
+  "description": "Калькулятор окупності енергетичних об'єктів: КГУ, СЕС та інших",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0A0F1E",
-  "theme_color": "#0A0F1E",
+  "background_color": "#f0f2f5",
+  "theme_color": "#1d4ed8",
   "orientation": "portrait",
   "icons": [
     {

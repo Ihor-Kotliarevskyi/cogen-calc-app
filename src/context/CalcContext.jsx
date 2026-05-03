@@ -14,7 +14,7 @@ function reducer(state, action) {
     case 'RESET':
       return { ...action.defaults };
     case 'LOAD_STATE':
-      return { ...action.state };
+      return { ...DEF, ...action.state };
     default:
       return state;
   }
