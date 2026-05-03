@@ -15,12 +15,15 @@ export async function fetchSolarDefaults() {
         updated: data?.updated ?? null,
         region: data?.region ?? null,
         sources: data?.sources?.solar ?? {},
+        apiStatus: data?.meta?.apiStatus || 'ok',
+        fallback: data?.meta?.fallback || false,
+        errorStatus: data?.meta?.errorStatus || null,
       },
     };
   } catch {
     return {
       defaults: { ...DEF },
-      meta: { updated: null, region: null, sources: {} },
+      meta: { updated: null, region: null, sources: {}, apiStatus: 'error', fallback: true, errorStatus: null },
     };
   }
 }

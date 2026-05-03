@@ -22,7 +22,14 @@ function reducer(state, action) {
 
 export function CogenProvider({ children }) {
   const [P, dispatch] = useReducer(reducer, { ...DEF });
-  const [marketMeta, setMarketMeta] = useState({ updated: null, region: null, sources: {} });
+  const [marketMeta, setMarketMeta] = useState({
+    updated: null,
+    region: null,
+    sources: {},
+    apiStatus: 'ok',
+    fallback: false,
+    errorStatus: null,
+  });
   const [marketDefaults, setMarketDefaults] = useState({ ...DEF });
   const [loading, setLoading] = useState(true);
   const result = useMemo(() => calc(P), [P]);

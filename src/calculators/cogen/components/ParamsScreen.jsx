@@ -91,6 +91,7 @@ function SliderGroup({ sliders, P, onChange, extra }) {
 
 export default function ParamsScreen() {
   const { P, dispatch, resetToDefaults, marketMeta } = useCalc();
+  const showRateLimit = marketMeta?.apiStatus === 'rate_limited' || marketMeta?.errorStatus === 429;
 
   const onChange = (key, value) => dispatch({ type: 'SET_PARAM', key, value });
   const setSH = (v) => dispatch({ type: 'SET_SH', value: v });
@@ -148,6 +149,11 @@ export default function ParamsScreen() {
         {/* ── Налаштування проекту ── */}
         <div className="sec">Налаштування проекту</div>
         <div className="card">
+          {showRateLimit && (
+            <div className="ib amber" style={{ marginBottom: 12 }}>
+              API limit reached (429). Показані локальні дані `market-data.json`.
+            </div>
+          )}
           <div className="sr">
             <div className="sr-head">
               <span className="sr-label">Назва проекту</span>

@@ -18,6 +18,7 @@ const SLIDERS = [
 
 export default function SolarParamsScreen() {
   const { P, dispatch, resetToDefaults, marketMeta } = useSolar();
+  const showRateLimit = marketMeta?.apiStatus === 'rate_limited' || marketMeta?.errorStatus === 429;
 
   return (
     <div className="screen active">
@@ -29,6 +30,11 @@ export default function SolarParamsScreen() {
 
         <div className="sec">Налаштування проекту</div>
         <div className="card">
+          {showRateLimit && (
+            <div className="ib amber" style={{ marginBottom: 12 }}>
+              API limit reached (429). Показані локальні дані `market-data.json`.
+            </div>
+          )}
           <div className="sr">
             <div className="sr-head"><span className="sr-label">Назва проєкту</span></div>
             <input

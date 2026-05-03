@@ -1,17 +1,16 @@
-# COGEN PWA
+﻿# EnergyROI Calc (COGEN + Solar)
 
-Простий React + Vite прогресивний веб-додаток (PWA) для калькулятора фінансів.
+React + Vite PWA для розрахунку окупності енергетичних проєктів (КГУ та СЕС).
 
-## 🚀 Структура
+## Структура
 
-- `src/` — компоненти React
-- `index.html` — основний HTML
-- `vite.config.js` — налаштування Vite
-- `public/` — статичні файли (наприклад `market-data.json`)
-- `manifest.json` — PWA manifest
-- `sw.js` — service worker для офлайн
+- `src/` — код застосунку
+- `public/market-data.json` — локальний snapshot тарифів
+- `api/tariffs.js` — Vercel serverless endpoint
+- `netlify/functions/tariffs.mjs` — Netlify serverless endpoint
+- `server/tariffsService.mjs` — спільна логіка завантаження/кешування тарифів
 
-## 🧰 Команди
+## Команди
 
 ```bash
 npm install
@@ -20,83 +19,57 @@ npm run build
 npm run preview
 ```
 
-## ✔️ Як перевірити “від нуля” (локально)
+## Режими в URL
 
-```bash
-rm -rf node_modules dist
-npm install
-npm run dev
-```
+- `?mode=cogen` — калькулятор КГУ
+- `?mode=solar` — калькулятор СЕС
+- порожній/невірний `mode` — стартовий екран
 
-Або для production-зборки:
+## Tariffs API Proxy (Energy Map)
 
-```bash
-npm run build
-npx serve dist
-```
-
-## 🌐 Деплой
-
-### Netlify (рекомендується)
-1. Підключити репозиторій до Netlify.
-2. Build command: `npm run build`
-3. Publish directory: `dist`
-4. Натиснути Deploy.
-
-> Якщо у вас SPA та клієнтська маршрутизація, створіть у `dist` файл `_redirects`:
-> ```
-> /* /index.html 200
-> ```
-
-### Vercel
-1. Підключити репозиторій до Vercel.
-2. Build command: `npm run build`
-3. Output Directory: `dist`
-4. Deploy.
-
-### Firebase Hosting
-```bash
-npm install -g firebase-tools
-firebase login
-firebase init hosting
-# Вкажіть 'dist' як public directory
-firebase deploy
-```
-
-## 🧭 Примітки
-
-- Якщо сайт не в корені домену (наприклад `/app/`) або деплоїте підпапку (GitHub Pages), додайте у `vite.config.js`:
-
-```js
-export default defineConfig({
-  base: './', // або '/repo-name/' для GitHub Pages
-  plugins: [react()]
-});
-```
-
-- `manifest.json` та PWA-іконки вже налаштовані для мобільного використання.
-
-## Tariffs API proxy (Energy Map)
-
-This project supports a server-side tariffs proxy to keep `ENERGYMAP_API_KEY` private and minimize API usage.
+Проксі потрібен, щоб не світити `ENERGYMAP_API_KEY` у фронтенді та економити ліміти API.
 
 ### Endpoints
+
 - Vercel: `/api/tariffs`
 - Netlify: `/.netlify/functions/tariffs`
 
-### Behavior
-- By default returns local `public/market-data.json` snapshot.
-- If `ENERGYMAP_AUTO_SYNC=true`, server refreshes from Energy Map by TTL.
-- Manual refresh: call `?refresh=1` with header `x-sync-token: <TARIFFS_SYNC_TOKEN>`.
+### Поведінка
 
-### Required server env vars
+- За замовчуванням повертається локальний `public/market-data.json`.
+- Якщо `ENERGYMAP_AUTO_SYNC=true`, проксі оновлює дані з Energy Map за TTL.
+- Примусове оновлення: `?refresh=1` + заголовок `x-sync-token: <TARIFFS_SYNC_TOKEN>`.
+
+### Обов'язкові env (server-side)
+
 - `ENERGYMAP_API_KEY`
 - `ENERGYMAP_GAS_UUID`
 - `ENERGYMAP_RDN_UUID`
 
-### Optional server env vars
-- `ENERGYMAP_GAS_VALUE_COLUMN` (default `1`)
-- `ENERGYMAP_RDN_VALUE_COLUMN` (default `1`)
-- `ENERGYMAP_AUTO_SYNC` (`false` by default)
-- `ENERGYMAP_CACHE_TTL_HOURS` (default `24`)
+### Опційні env
+
+- `ENERGYMAP_HEAT_UUID`
+- `ENERGYMAP_GREEN_TARIFF_UUID`
+- `ENERGYMAP_GAS_VALUE_COLUMN` (default: `1`)
+- `ENERGYMAP_RDN_VALUE_COLUMN` (default: `1`)
+- `ENERGYMAP_HEAT_VALUE_COLUMN` (default: `1`)
+- `ENERGYMAP_GREEN_TARIFF_VALUE_COLUMN` (default: `1`)
+- `ENERGYMAP_AUTO_SYNC` (default: `false`)
+- `ENERGYMAP_CACHE_TTL_HOURS` (default: `24`)
 - `TARIFFS_SYNC_TOKEN`
+
+## Локальна перевірка з Netlify deploy
+
+Якщо сайт вже задеплоєний на Netlify, можна локально запускати тільки фронтенд, а API викликати на проді:
+
+```env
+VITE_TARIFFS_API_URL=https://<your-site>.netlify.app/.netlify/functions/tariffs
+```
+
+Після цього `npm run dev` працюватиме з віддаленою serverless функцією.
+
+## Примітка про 429
+
+При вичерпанні ліміту Energy Map (`HTTP 429`) UI показує явний статус:
+
+`API limit reached (429). Показані локальні дані market-data.json.`
