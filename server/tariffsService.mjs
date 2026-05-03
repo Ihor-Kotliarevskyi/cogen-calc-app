@@ -3,10 +3,13 @@ import path from 'node:path';
 
 const ENERGY_MAP_BASE = 'https://energy-map.info';
 const DEFAULT_TTL_HOURS = 24;
+const SNAPSHOT_BLOB_KEY = 'tariffs-snapshot-v1';
+const SNAPSHOT_BLOB_STORE = 'energy-roi-calc';
 
 let memoryCache = null;
 let lastSyncAt = 0;
 let syncInFlight = null;
+let blobStorePromise = null;
 
 function toNumber(value) {
   if (value == null) return null;
@@ -103,6 +106,43 @@ async function readLocalSnapshot() {
   const raw = await fs.readFile(localPath, 'utf8');
   const normalized = raw.replace(/^\uFEFF/, '');
   return JSON.parse(normalized);
+}
+
+async function getBlobStore() {
+  if (blobStorePromise) return blobStorePromise;
+  blobStorePromise = (async () => {
+    try {
+      const { getStore } = await import('@netlify/blobs');
+      return getStore(SNAPSHOT_BLOB_STORE);
+    } catch {
+      return null;
+    }
+  })();
+  return blobStorePromise;
+}
+
+async function readPersistedSnapshot() {
+  const store = await getBlobStore();
+  if (!store) return null;
+  try {
+    const data = await store.get(SNAPSHOT_BLOB_KEY, { type: 'json' });
+    return data && typeof data === 'object' ? data : null;
+  } catch {
+    return null;
+  }
+}
+
+async function writePersistedSnapshot(snapshot) {
+  const store = await getBlobStore();
+  if (!store) return false;
+  try {
+    await store.set(SNAPSHOT_BLOB_KEY, JSON.stringify(snapshot), {
+      metadata: { updatedAt: new Date().toISOString() },
+    });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function fetchEnergyMapCsv({ token, uuid, format = 'csv', language = 'uk' }) {
@@ -242,6 +282,8 @@ async function syncWithFallback(localSnapshot) {
 async function getSnapshotInternal({ forceSync = false } = {}) {
   const now = Date.now();
   const localSnapshot = await readLocalSnapshot();
+  const persistedSnapshot = await readPersistedSnapshot();
+  const baseSnapshot = persistedSnapshot || localSnapshot;
 
   if (!forceSync && memoryCache && !shouldAutoSync(now)) {
     return { ...memoryCache, meta: { ...(memoryCache.meta || {}), cache: 'memory' } };
@@ -249,14 +291,22 @@ async function getSnapshotInternal({ forceSync = false } = {}) {
 
   if (!forceSync && !shouldAutoSync(now)) {
     const response = {
-      snapshot: localSnapshot,
-      meta: { stale: false, source: 'local-snapshot', cache: 'file' },
+      snapshot: baseSnapshot,
+      meta: {
+        stale: false,
+        source: persistedSnapshot ? 'persisted-snapshot' : 'local-snapshot',
+        cache: persistedSnapshot ? 'blob' : 'file',
+      },
     };
     memoryCache = response;
     return response;
   }
 
-  const synced = await syncWithFallback(localSnapshot);
+  const synced = await syncWithFallback(baseSnapshot);
+  if (!synced?.meta?.fallback && synced?.meta?.source === 'energy-map-api') {
+    const persisted = await writePersistedSnapshot(synced.snapshot);
+    synced.meta = { ...(synced.meta || {}), persisted: persisted ? 'blob' : 'none' };
+  }
   lastSyncAt = now;
   memoryCache = synced;
   return synced;

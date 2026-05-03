@@ -40,6 +40,7 @@ npm run preview
 - За замовчуванням повертається локальний `public/market-data.json`.
 - Якщо `ENERGYMAP_AUTO_SYNC=true`, проксі оновлює дані з Energy Map за TTL.
 - Примусове оновлення: `?refresh=1` + заголовок `x-sync-token: <TARIFFS_SYNC_TOKEN>`.
+- Після успішного sync snapshot зберігається в Netlify Blobs і переживає cold starts.
 
 ### Обов'язкові env (server-side)
 
