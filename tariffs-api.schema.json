@@ -1,0 +1,45 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EnergyROI Tariffs API payload",
+  "type": "object",
+  "properties": {
+    "updated": { "type": ["string", "null"] },
+    "region": { "type": ["string", "null"] },
+    "sources": { "type": "object" },
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "gp": { "type": "number" },
+        "rdm": { "type": "number" },
+        "trans": { "type": "number" },
+        "distr": { "type": "number" },
+        "hp": { "type": "number" },
+        "sh": { "type": "number" },
+        "vrfW": { "type": "number" },
+        "vrfS": { "type": "number" },
+        "elB": { "type": "number" },
+        "capex": { "type": "number" },
+        "opex": { "type": "number" },
+        "av": { "type": "number" },
+        "solar": {
+          "type": "object",
+          "properties": {
+            "pvMW": { "type": "number" },
+            "specificYield": { "type": "number" },
+            "degradation": { "type": "number" },
+            "selfUseShare": { "type": "number" },
+            "gridPrice": { "type": "number" },
+            "feedInTariff": { "type": "number" },
+            "reserveShare": { "type": "number" },
+            "reserveEfficiency": { "type": "number" },
+            "reserveCyclesYear": { "type": "number" },
+            "reservePeakPremium": { "type": "number" },
+            "capex": { "type": "number" },
+            "opex": { "type": "number" }
+          }
+        }
+      }
+    }
+  },
+  "required": ["defaults"]
+}
