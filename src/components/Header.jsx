@@ -11,18 +11,20 @@ export default function Header() {
 
   return (
     <div className="hdr">
-      <div className="hdr-left">
-        <h1>КГУ 1 МВт · Бізнес-центр</h1>
-        <p>
-          {fN(result.h)} год/рік · газ {fN(P.gp)} грн/тис.м³
-          {marketMeta.region && (
-            <span className="hdr-region"> · {marketMeta.region}</span>
-          )}
-        </p>
-      </div>
-      <div className="live">
-        <div className="live-dot"></div>
-        <span className="live-label">{sourceLabel}</span>
+      <div className="hdr-inner">
+        <div className="hdr-left">
+          <h1>КГУ 1 МВт · Бізнес-центр</h1>
+          <p>
+            {fN(result.h)} год/рік · газ {fN(P.gp)} грн/тис.м³
+            {marketMeta.region && (
+              <span className="hdr-region"> · {marketMeta.region}</span>
+            )}
+          </p>
+        </div>
+        <div className="live">
+          <div className="live-dot"></div>
+          <span className="live-label">{sourceLabel}</span>
+        </div>
       </div>
     </div>
   );

@@ -72,6 +72,7 @@ export default function SavedScenariosScreen() {
 
   return (
     <div className="screen active">
+      <div className="page-wrap">
       <div className="title-row">
         <div className="scr-title">Збережені</div>
         <button className="reset-btn save-btn" onClick={() => setShowSaveModal(true)}>
@@ -162,6 +163,7 @@ export default function SavedScenariosScreen() {
           );
         })
       )}
+      </div>
     </div>
   );
 }

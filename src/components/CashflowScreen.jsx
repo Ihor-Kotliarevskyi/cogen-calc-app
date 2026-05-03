@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useCalc } from '../context/CalcContext.jsx';
 import { calc, fN } from '../lib/calc.js';
 
@@ -60,22 +60,18 @@ function drawChart(canvas, cf) {
   // Fill area
   ctx.beginPath();
   ctx.moveTo(xOf(0), yOf(cf[0]));
-  cf.forEach((_, i) => {
-    if (i > 0) ctx.lineTo(xOf(i), yOf(cf[i]));
-  });
+  cf.forEach((_, i) => { if (i > 0) ctx.lineTo(xOf(i), yOf(cf[i])); });
   ctx.lineTo(xOf(n - 1), H - pad.b);
   ctx.lineTo(xOf(0), H - pad.b);
   ctx.closePath();
-  ctx.fillStyle = 'rgba(24,95,165,0.08)';
+  ctx.fillStyle = 'rgba(29,78,216,0.07)';
   ctx.fill();
 
   // Line
   ctx.beginPath();
   ctx.moveTo(xOf(0), yOf(cf[0]));
-  cf.forEach((_, i) => {
-    if (i > 0) ctx.lineTo(xOf(i), yOf(cf[i]));
-  });
-  ctx.strokeStyle = '#185FA5';
+  cf.forEach((_, i) => { if (i > 0) ctx.lineTo(xOf(i), yOf(cf[i])); });
+  ctx.strokeStyle = '#1d4ed8';
   ctx.lineWidth = 2;
   ctx.stroke();
 
@@ -83,7 +79,7 @@ function drawChart(canvas, cf) {
   cf.forEach((v, i) => {
     ctx.beginPath();
     ctx.arc(xOf(i), yOf(v), 3.5, 0, Math.PI * 2);
-    ctx.fillStyle = v >= 0 ? '#1D9E75' : '#E24B4A';
+    ctx.fillStyle = v >= 0 ? '#059669' : '#dc2626';
     ctx.fill();
   });
 
@@ -102,7 +98,6 @@ export default function CashflowScreen() {
 
   useEffect(() => {
     if (canvasRef.current) {
-      // Small delay to ensure layout is computed
       const t = setTimeout(() => drawChart(canvasRef.current, r.cf), 30);
       return () => clearTimeout(t);
     }
@@ -115,89 +110,103 @@ export default function CashflowScreen() {
   const elP = [6, 7, 8, 9, 10, 11, 12, 13, 14];
   const gS = [
     { g: 18000, c: 'var(--green)', l: 'Газ 18т.' },
-    { g: 21000, c: 'var(--blue)', l: 'Газ 21т.' },
-    { g: 24000, c: 'var(--red)', l: 'Газ 24т.' },
+    { g: 21000, c: 'var(--blue)',  l: 'Газ 21т.' },
+    { g: 24000, c: 'var(--red)',   l: 'Газ 24т.' },
   ];
 
   return (
     <div className="screen active">
-      <div className="scr-title" style={{ marginBottom: 14 }}>CF / Графік</div>
-      <div className="mg">
-        <div className="m">
-          <div className="ml">окупність</div>
-          <div className={`mv ${pbCls}`}>{r.pb ? r.pb.toFixed(1) + ' р.' : '∞'}</div>
-          <div className="ms">{be > 0 ? 'рік ' + be : 'не окупається'}</div>
-        </div>
-        <div className="m">
-          <div className="ml">NPV за 15 р.</div>
-          <div className={`mv ${npv > 0 ? 'cg' : 'cr'}`}>{fN(npv, 1)} млн</div>
-          <div className="ms">без дисконту</div>
-        </div>
-      </div>
+      <div className="page-wrap">
+        <div className="scr-title" style={{ marginBottom: 16 }}>CF / Графік</div>
 
-      <div className="sec">Кумулятивний CF, млн грн</div>
-      <div className="card" style={{ padding: 12 }}>
-        <div className="chart-wrap">
-          <canvas ref={canvasRef}></canvas>
-        </div>
-      </div>
-
-      <div className="sec">По роках</div>
-      <div className="card">
-        {r.cf.map((v, i) => (
-          <div key={i} className="cf-row">
-            <span className="cf-yr">{i === 0 ? 'Старт' : 'Рік ' + i}</span>
-            <span className="cf-v" style={{ color: v >= 0 ? 'var(--green)' : 'var(--red)' }}>
-              {v >= 0 ? '+' : ''}{fN(v, 1)} млн
-            </span>
-            <span
-              className="cf-badge"
-              style={{
-                background: v >= 0 ? 'var(--green-bg)' : 'var(--red-bg)',
-                color: v >= 0 ? 'var(--green)' : 'var(--red)',
-              }}
-            >
-              {v >= 0 ? '✓ окупився' : '· в мінусі'}
-            </span>
+        {/* Метрики — повна ширина */}
+        <div className="mg">
+          <div className="m">
+            <div className="ml">окупність</div>
+            <div className={`mv ${pbCls}`}>{r.pb ? r.pb.toFixed(1) + ' р.' : '∞'}</div>
+            <div className="ms">{be > 0 ? 'рік ' + be : 'не окупається'}</div>
           </div>
-        ))}
-      </div>
+          <div className="m">
+            <div className="ml">NPV за 15 р.</div>
+            <div className={`mv ${npv > 0 ? 'cg' : 'cr'}`}>{fN(npv, 1)} млн</div>
+            <div className="ms">без дисконту</div>
+          </div>
+        </div>
 
-      <div className="sec">Чутливість окупності</div>
-      <div className="card" style={{ padding: 12 }}>
-        <table className="st">
-          <thead>
-            <tr>
-              <th>Ціна ел.</th>
-              {gS.map((s) => (
-                <th key={s.g} style={{ color: s.c }}>{s.l}</th>
+        {/* Графік — повна ширина */}
+        <div className="sec">Кумулятивний CF, млн грн</div>
+        <div className="card" style={{ padding: 12 }}>
+          <div className="chart-wrap">
+            <canvas ref={canvasRef}></canvas>
+          </div>
+        </div>
+
+        {/* По роках зліва, Чутливість справа */}
+        <div className="two-col-grid">
+
+          <div>
+            <div className="sec">По роках</div>
+            <div className="card">
+              {r.cf.map((v, i) => (
+                <div key={i} className="cf-row">
+                  <span className="cf-yr">{i === 0 ? 'Старт' : 'Рік ' + i}</span>
+                  <span className="cf-v" style={{ color: v >= 0 ? 'var(--green)' : 'var(--red)' }}>
+                    {v >= 0 ? '+' : ''}{fN(v, 1)} млн
+                  </span>
+                  <span
+                    className="cf-badge"
+                    style={{
+                      background: v >= 0 ? 'var(--green-bg)' : 'var(--red-bg)',
+                      color: v >= 0 ? 'var(--green)' : 'var(--red)',
+                    }}
+                  >
+                    {v >= 0 ? '✓ окупився' : '· в мінусі'}
+                  </span>
+                </div>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {elP.map((ep) => (
-              <tr key={ep}>
-                <td>{ep} грн</td>
-                {gS.map((s) => {
-                  const sc = calc({
-                    ...P,
-                    rdm: ep * 1000 - P.trans - P.distr,
-                    gp: s.g,
-                  });
-                  const pb = sc.pb;
-                  const c = pb
-                    ? pb < 4 ? 'var(--green)' : pb < 7 ? 'var(--amber)' : 'var(--red)'
-                    : 'var(--red)';
-                  return (
-                    <td key={s.g} style={{ color: c }}>
-                      {pb ? pb.toFixed(1) + ' р.' : '∞'}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            </div>
+          </div>
+
+          <div>
+            <div className="sec">Чутливість окупності</div>
+            <div className="card" style={{ padding: 12 }}>
+              <table className="st">
+                <thead>
+                  <tr>
+                    <th>Ціна ел.</th>
+                    {gS.map((s) => (
+                      <th key={s.g} style={{ color: s.c }}>{s.l}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {elP.map((ep) => (
+                    <tr key={ep}>
+                      <td>{ep} грн</td>
+                      {gS.map((s) => {
+                        const sc = calc({
+                          ...P,
+                          rdm: ep * 1000 - P.trans - P.distr,
+                          gp: s.g,
+                        });
+                        const pb = sc.pb;
+                        const c = pb
+                          ? pb < 4 ? 'var(--green)' : pb < 7 ? 'var(--amber)' : 'var(--red)'
+                          : 'var(--red)';
+                        return (
+                          <td key={s.g} style={{ color: c }}>
+                            {pb ? pb.toFixed(1) + ' р.' : '∞'}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );

@@ -57,59 +57,65 @@ export default function ScenariosScreen() {
 
   return (
     <div className="screen active">
-      <div className="scr-title" style={{ marginBottom: 14 }}>Сценарії</div>
+      <div className="page-wrap">
+        <div className="scr-title" style={{ marginBottom: 16 }}>Сценарії</div>
 
-      {scenarios.map((s, i) => (
-        <div key={i} className={`card${s.best ? ' best' : ''}`}>
-          <div className="sc-badge" style={{ background: s.bc, color: s.tc }}>{s.badge}</div>
-          <div className="sc-title">{s.title}</div>
-          <div className="sc-row">
-            <span className="sc-k">Собів. ел.</span>
-            <span className="sc-v" style={{ color: s.r.ecg < s.r.ep ? 'var(--green)' : 'var(--red)' }}>
-              {fG(s.r.ecg)}
-            </span>
-          </div>
-          <div className="sc-row">
-            <span className="sc-k">Тепло в мережу</span>
-            <span className="sc-v">{fN(s.r.gcT, 0)} Гкал</span>
-          </div>
-          <div className="sc-row">
-            <span className="sc-k">Прибуток / рік</span>
-            <span className="sc-v" style={{ color: s.r.net > 0 ? 'var(--green)' : 'var(--red)' }}>
-              {fM(s.r.net)}
-            </span>
-          </div>
-          <div className="sc-row">
-            <span className="sc-k">Окупність</span>
-            <span className="sc-v" style={{ color: s.r.pb ? (s.r.pb < 5 ? 'var(--green)' : 'var(--amber)') : 'var(--red)' }}>
-              {s.r.pb ? s.r.pb.toFixed(1) + ' р.' : '∞'}
-            </span>
-          </div>
+        {/* Картки сценаріїв — 2×2 на tablet+, 1 колонка на mobile */}
+        <div className="sc-cards-grid">
+          {scenarios.map((s, i) => (
+            <div key={i} className={`card${s.best ? ' best' : ''}`}>
+              <div className="sc-badge" style={{ background: s.bc, color: s.tc }}>{s.badge}</div>
+              <div className="sc-title">{s.title}</div>
+              <div className="sc-row">
+                <span className="sc-k">Собів. ел.</span>
+                <span className="sc-v" style={{ color: s.r.ecg < s.r.ep ? 'var(--green)' : 'var(--red)' }}>
+                  {fG(s.r.ecg)}
+                </span>
+              </div>
+              <div className="sc-row">
+                <span className="sc-k">Тепло в мережу</span>
+                <span className="sc-v">{fN(s.r.gcT, 0)} Гкал</span>
+              </div>
+              <div className="sc-row">
+                <span className="sc-k">Прибуток / рік</span>
+                <span className="sc-v" style={{ color: s.r.net > 0 ? 'var(--green)' : 'var(--red)' }}>
+                  {fM(s.r.net)}
+                </span>
+              </div>
+              <div className="sc-row">
+                <span className="sc-k">Окупність</span>
+                <span className="sc-v" style={{ color: s.r.pb ? (s.r.pb < 5 ? 'var(--green)' : 'var(--amber)') : 'var(--red)' }}>
+                  {s.r.pb ? s.r.pb.toFixed(1) + ' р.' : '∞'}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
 
-      <div className="sec">Порівняльна таблиця</div>
-      <div className="card" style={{ padding: 12 }}>
-        <table className="st">
-          <thead>
-            <tr>
-              <th></th>
-              {scenarios.map((s, i) => (
-                <th key={i} style={{ color: s.tc, fontSize: 10 }}>{s.title.split(' ')[0]}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {metrics.map((m, mi) => (
-              <tr key={mi}>
-                <td>{m.l}</td>
-                {scenarios.map((s, si) => (
-                  <td key={si}>{m.f(s.r)}</td>
+        {/* Порівняльна таблиця — повна ширина */}
+        <div className="sec">Порівняльна таблиця</div>
+        <div className="card" style={{ padding: 12 }}>
+          <table className="st">
+            <thead>
+              <tr>
+                <th></th>
+                {scenarios.map((s, i) => (
+                  <th key={i} style={{ color: s.tc, fontSize: 10 }}>{s.title.split(' ')[0]}</th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {metrics.map((m, mi) => (
+                <tr key={mi}>
+                  <td>{m.l}</td>
+                  {scenarios.map((s, si) => (
+                    <td key={si}>{m.f(s.r)}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

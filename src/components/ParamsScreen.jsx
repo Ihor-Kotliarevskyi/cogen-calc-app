@@ -85,7 +85,7 @@ export default function ParamsScreen() {
 
   const heatExtra = (
     <div style={{ marginTop: 14 }}>
-      <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 8 }}>
+      <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--text2)', marginBottom: 8 }}>
         Мережа бере тепло влітку?{' '}
         <span className="tag" style={{ background: 'var(--green-bg)', color: 'var(--green)' }}>ЛТЕ</span>
       </div>
@@ -112,18 +112,44 @@ export default function ParamsScreen() {
 
   return (
     <div className="screen active">
-      <div className="title-row">
-        <div className="scr-title">Параметри</div>
-        <button className="reset-btn" onClick={handleReset}>Скинути</button>
+      <div className="page-wrap">
+        <div className="title-row">
+          <div className="scr-title">Параметри</div>
+          <button className="reset-btn" onClick={handleReset}>Скинути</button>
+        </div>
+
+        {/*
+          DOM order for mobile: Ціни → Інвестиції → Електрика → Тепло
+          Grid placement for tablet+:
+            Ціни      → col 1, row 1
+            Інвестиції → col 2, row 1
+            Електрика  → col 1, row 2
+            Тепло      → col 2, row 2
+        */}
+        <div className="params-grid">
+
+          <div className="params-item params-prices">
+            <div className="sec">Ціни</div>
+            <SliderGroup sliders={SLIDERS.prices} P={P} onChange={onChange} extra={pricesDerived} />
+          </div>
+
+          <div className="params-item params-inv">
+            <div className="sec">Інвестиції</div>
+            <SliderGroup sliders={SLIDERS.inv} P={P} onChange={onChange} />
+          </div>
+
+          <div className="params-item params-el">
+            <div className="sec">Електричне навантаження БЦ</div>
+            <SliderGroup sliders={SLIDERS.el} P={P} onChange={onChange} extra={elDerived} />
+          </div>
+
+          <div className="params-item params-heat">
+            <div className="sec">Тепло в мережу</div>
+            <SliderGroup sliders={SLIDERS.heat} P={P} onChange={onChange} extra={heatExtra} />
+          </div>
+
+        </div>
       </div>
-      <div className="sec">Ціни</div>
-      <SliderGroup sliders={SLIDERS.prices} P={P} onChange={onChange} extra={pricesDerived} />
-      <div className="sec">Тепло в мережу</div>
-      <SliderGroup sliders={SLIDERS.heat} P={P} onChange={onChange} extra={heatExtra} />
-      <div className="sec">Електричне навантаження БЦ</div>
-      <SliderGroup sliders={SLIDERS.el} P={P} onChange={onChange} extra={elDerived} />
-      <div className="sec">Інвестиції</div>
-      <SliderGroup sliders={SLIDERS.inv} P={P} onChange={onChange} />
     </div>
   );
 }
