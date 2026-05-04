@@ -8,7 +8,7 @@ import process from "node:process";
 export default defineConfig(({ mode }) => ({
   base:
     mode === "production" && process.env.GITHUB_ACTIONS
-      ? "/cogen-calc-app/"
+      ? "/energyroi-calc/"
       : "/",
   plugins: [react(), babel({ presets: [reactCompilerPreset()] })],
 }));
