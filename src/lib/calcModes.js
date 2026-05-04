@@ -2,14 +2,14 @@
   {
     key: 'cogen',
     label: 'КГУ',
-    icon: 'CG',
+    icon: 'bolt',
     title: 'Когенерація',
     available: true,
   },
   {
     key: 'solar',
     label: 'СЕС',
-    icon: 'PV',
+    icon: 'sun',
     title: 'Сонячна електростанція',
     available: true,
   },

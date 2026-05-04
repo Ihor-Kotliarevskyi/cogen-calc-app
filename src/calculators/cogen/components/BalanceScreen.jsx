@@ -8,12 +8,7 @@ export default function BalanceScreen() {
   return (
     <div className="screen active">
       <div className="page-wrap">
-        <div className="scr-title" style={{ marginBottom: 16 }}>Баланси</div>
-
-        {/* Два баланси — ліво/право на tablet+ */}
         <div className="two-col-grid">
-
-          {/* ── Лівa: Тепловий баланс ── */}
           <div>
             <div className="sec">Тепловий баланс</div>
             <div className="ib blue">
@@ -58,7 +53,6 @@ export default function BalanceScreen() {
             </div>
           </div>
 
-          {/* ── Права: Електричний баланс ── */}
           <div>
             <div className="sec">Електричний баланс</div>
             <div className={`ib ${r.iW > 0 ? 'amber' : 'blue'}`}>

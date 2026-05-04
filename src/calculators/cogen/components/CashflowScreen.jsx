@@ -29,7 +29,6 @@ function drawChart(canvas, cf) {
   const xOf = (i) => pad.l + (i / (n - 1)) * cW;
   const yOf = (v) => pad.t + cH - ((v - minV) / rng) * cH;
 
-  // Grid lines
   for (let i = 0; i <= 4; i++) {
     const y = pad.t + (i * cH) / 4;
     ctx.strokeStyle = 'rgba(0,0,0,0.06)';
@@ -45,7 +44,6 @@ function drawChart(canvas, cf) {
     ctx.fillText(fN(val, 0), pad.l - 4, y + 3);
   }
 
-  // Zero reference
   if (minV < 0 && maxV > 0) {
     const y0 = yOf(0);
     ctx.strokeStyle = 'rgba(29,158,117,.4)';
@@ -58,7 +56,6 @@ function drawChart(canvas, cf) {
     ctx.setLineDash([]);
   }
 
-  // Fill area
   ctx.beginPath();
   ctx.moveTo(xOf(0), yOf(cf[0]));
   cf.forEach((_, i) => { if (i > 0) ctx.lineTo(xOf(i), yOf(cf[i])); });
@@ -68,7 +65,6 @@ function drawChart(canvas, cf) {
   ctx.fillStyle = 'rgba(29,78,216,0.07)';
   ctx.fill();
 
-  // Line
   ctx.beginPath();
   ctx.moveTo(xOf(0), yOf(cf[0]));
   cf.forEach((_, i) => { if (i > 0) ctx.lineTo(xOf(i), yOf(cf[i])); });
@@ -76,7 +72,6 @@ function drawChart(canvas, cf) {
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // Dots
   cf.forEach((v, i) => {
     ctx.beginPath();
     ctx.arc(xOf(i), yOf(v), 3.5, 0, Math.PI * 2);
@@ -84,7 +79,6 @@ function drawChart(canvas, cf) {
     ctx.fill();
   });
 
-  // X labels
   ctx.fillStyle = '#9ca3af';
   ctx.font = '9px Inter,sans-serif';
   ctx.textAlign = 'center';
@@ -118,23 +112,6 @@ export default function CashflowScreen() {
   return (
     <div className="screen active">
       <div className="page-wrap">
-        <div className="scr-title" style={{ marginBottom: 16 }}>CF / Графік</div>
-
-        {/* Метрики — повна ширина */}
-        <div className="mg">
-          <div className="m">
-            <div className="ml">окупність</div>
-            <div className={`mv ${pbCls}`}>{r.pb ? r.pb.toFixed(1) + ' р.' : '∞'}</div>
-            <div className="ms">{be > 0 ? 'рік ' + be : 'не окупається'}</div>
-          </div>
-          <div className="m">
-            <div className="ml">NPV за 15 р.</div>
-            <div className={`mv ${npv > 0 ? 'cg' : 'cr'}`}>{fN(npv, 1)} млн</div>
-            <div className="ms">без дисконту</div>
-          </div>
-        </div>
-
-        {/* Графік — повна ширина */}
         <div className="sec">Кумулятивний CF, млн грн</div>
         <div className="card" style={{ padding: 12 }}>
           <div className="chart-wrap">
@@ -142,7 +119,6 @@ export default function CashflowScreen() {
           </div>
         </div>
 
-        {/* По роках зліва, Чутливість справа */}
         <div className="two-col-grid">
 
           <div>
@@ -171,6 +147,11 @@ export default function CashflowScreen() {
           <div>
             <div className="sec">Чутливість окупності</div>
             <div className="card" style={{ padding: 12 }}>
+              <div className="cf-summary-row">
+                <span className="cf-summary-item">Окупність: <b className={pbCls}>{r.pb ? r.pb.toFixed(1) + ' р.' : '∞'}</b></span>
+                <span className="cf-summary-item">NPV 15 р.: <b className={npv > 0 ? 'cg' : 'cr'}>{fN(npv, 1)} млн</b></span>
+                <span className="cf-summary-item">Break-even: <b>{be > 0 ? 'рік ' + be : 'не окупається'}</b></span>
+              </div>
               <table className="st">
                 <thead>
                   <tr>

@@ -61,7 +61,6 @@ export default function ScenariosScreen() {
       <div className="page-wrap">
         <div className="scr-title" style={{ marginBottom: 16 }}>Сценарії</div>
 
-        {/* Картки сценаріїв — 2×2 на tablet+, 1 колонка на mobile */}
         <div className="sc-cards-grid">
           {scenarios.map((s, i) => (
             <div key={i} className={`card${s.best ? ' best' : ''}`}>
@@ -93,7 +92,6 @@ export default function ScenariosScreen() {
           ))}
         </div>
 
-        {/* Порівняльна таблиця — повна ширина */}
         <div className="sec">Порівняльна таблиця</div>
         <div className="card" style={{ padding: 12 }}>
           <table className="st">

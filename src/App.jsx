@@ -1,6 +1,7 @@
-﻿import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import CogenCalculator from './calculators/cogen/index.jsx';
 import SolarCalculator from './calculators/solar/index.jsx';
+import Icon from './shared/components/Icon.jsx';
 
 const MODES = ['cogen', 'solar'];
 
@@ -36,30 +37,67 @@ export default function App() {
 
   const landingCards = useMemo(
     () => [
-      { key: 'cogen', title: 'КГУ', subtitle: 'Когенерація', available: true },
-      { key: 'solar', title: 'СЕС', subtitle: 'Сонячна електростанція', available: true },
+      {
+        key: 'cogen',
+        title: 'КГУ',
+        subtitle: 'Когенераційна установка',
+        meta: 'Електрика, тепло, газ',
+        icon: 'factory',
+        available: true,
+      },
+      {
+        key: 'solar',
+        title: 'СЕС',
+        subtitle: 'Сонячна електростанція',
+        meta: 'Електрика, сонячні панелі, батареї',
+        icon: 'sun',
+        available: true,
+      },
     ],
     []
   );
 
   if (!mode) {
     return (
-      <div className="app" style={{ justifyContent: 'center', alignItems: 'center', padding: '24px' }}>
-        <div className="card" style={{ width: '100%', maxWidth: '920px' }}>
-          <div className="scr-title" style={{ marginBottom: '18px' }}>Калькулятор окупності енергетики</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
-            {landingCards.map((card) => (
-              <button
-                key={card.key}
-                className="card"
-                style={{ textAlign: 'left', cursor: card.available ? 'pointer' : 'not-allowed', opacity: card.available ? 1 : 0.6 }}
-                onClick={() => card.available && selectMode(card.key)}
-                disabled={!card.available}
-              >
-                <div style={{ fontWeight: 700, marginBottom: '4px' }}>{card.title}</div>
-                <div style={{ color: 'var(--text2)' }}>{card.subtitle}</div>
-              </button>
-            ))}
+      <div className="landing-shell">
+        <div className="landing-window">
+          <div className="landing-brand-row">
+            <div className="landing-brand">
+              <span className="brand-logo brand-logo-rich brand-logo-xl" aria-hidden="true"><span><Icon name="chart" className="landing-eyebrow-icon" /></span></span>
+              <div>
+                <div className="landing-brand-title">EnergyROI</div>
+                <div className="landing-brand-sub">Економіка енергопроєктів</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="landing-content">
+            <div className="landing-copy-block">
+              <h1 className="landing-title">Оберіть модель та переходьте до розрахунку.</h1>
+              <p className="landing-copy">
+                Актуальні тарифи, зручне введення параметрів та швидка оцінка собівартості та окупності.
+              </p>
+            </div>
+
+            <div className="landing-cards landing-cards-compact">
+              {landingCards.map((card) => (
+                <button
+                  key={card.key}
+                  className={`landing-card${card.available ? '' : ' disabled'}`}
+                  onClick={() => card.available && selectMode(card.key)}
+                  disabled={!card.available}
+                >
+                  <div className="landing-card-icon">
+                    <Icon name={card.icon} />
+                  </div>
+                  <div className="landing-card-body">
+                    <div className="landing-card-title">{card.title}</div>
+                    <div className="landing-card-subtitle">{card.subtitle}</div>
+                    <div className="landing-card-meta">{card.meta}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

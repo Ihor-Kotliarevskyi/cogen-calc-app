@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import Header from '../../shared/components/Header.jsx';
 import TabBar from '../../shared/components/TabBar.jsx';
 import { CALC_MODES } from '../../lib/calcModes.js';
@@ -10,14 +10,16 @@ import SolarGenerationScreen from './components/SolarGenerationScreen.jsx';
 import SolarCashflowScreen from './components/SolarCashflowScreen.jsx';
 import SolarScenariosScreen from './components/SolarScenariosScreen.jsx';
 import SolarSavedScenariosScreen from './components/SolarSavedScenariosScreen.jsx';
+import SolarFaqScreen from './components/SolarFaqScreen.jsx';
 
 const TABS = [
   { key: 'params', label: 'Параметри' },
   { key: 'dash', label: 'Результат' },
   { key: 'gen', label: 'Генерація' },
-  { key: 'cf', label: 'CF / Графік' },
+  { key: 'cf', label: 'Графік' },
   { key: 'sc', label: 'Сценарії' },
   { key: 'saved', label: 'Збережені' },
+  { key: 'faq', label: 'FAQ' },
 ];
 
 export default function SolarApp({ calcMode, onModeChange }) {
@@ -25,7 +27,6 @@ export default function SolarApp({ calcMode, onModeChange }) {
   const { P, loading } = useSolar();
 
   useAutoSave(P, 'solar');
-  const subtitle = useMemo(() => 'Сонячний модуль', []);
 
   if (loading) {
     return (
@@ -37,7 +38,7 @@ export default function SolarApp({ calcMode, onModeChange }) {
 
   return (
     <div className="app">
-      <Header calcMode={calcMode} onModeChange={onModeChange} modes={CALC_MODES} subtitle={subtitle} />
+      <Header calcMode={calcMode} onModeChange={onModeChange} modes={CALC_MODES} title="Сонячна електростанція" />
       <TabBar tabs={TABS} active={activeTab} onChange={setActiveTab} />
       <div className="content">
         {activeTab === 'params' && <SolarParamsScreen />}
@@ -45,7 +46,8 @@ export default function SolarApp({ calcMode, onModeChange }) {
         {activeTab === 'gen' && <SolarGenerationScreen />}
         {activeTab === 'cf' && <SolarCashflowScreen />}
         {activeTab === 'sc' && <SolarScenariosScreen />}
-        {activeTab === 'saved' && <SolarSavedScenariosScreen />}
+        {activeTab === 'saved' && <SolarSavedScenariosScreen onLoadScenario={() => setActiveTab('params')} />}
+        {activeTab === 'faq' && <SolarFaqScreen />}
       </div>
     </div>
   );

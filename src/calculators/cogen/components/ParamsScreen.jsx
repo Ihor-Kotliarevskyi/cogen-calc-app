@@ -1,14 +1,15 @@
-﻿import React from 'react';
+import React from 'react';
 import { useCalc } from '../context/CogenContext.jsx';
 import { fN } from '../../../shared/lib/formatters.js';
 
 const SLIDERS = {
-  // ── Установка КГУ (параметризовані) ──
   unit: [
     {
       key: 'elMW',
       label: 'Електрична потужність КГУ, МВт',
-      min: 0.1, max: 5, step: 0.1,
+      min: 0.1,
+      max: 5,
+      step: 0.1,
       fmt: (v) => v.toFixed(1) + ' МВт',
       tag: 'ел.',
       tc: 'var(--blue)',
@@ -16,39 +17,42 @@ const SLIDERS = {
     {
       key: 'thMW',
       label: 'Теплова потужність КГУ, МВт',
-      min: 0.1, max: 6, step: 0.1,
+      min: 0.1,
+      max: 6,
+      step: 0.1,
       fmt: (v) => v.toFixed(1) + ' МВт',
       tag: 'теп.',
       tc: 'var(--amber)',
     },
     {
       key: 'eff',
-      label: 'Електричний ККД (η_el)',
-      min: 0.25, max: 0.50, step: 0.01,
+      label: 'Електричний ККД, %',
+      min: 0.25,
+      max: 0.5,
+      step: 0.01,
       fmt: (v) => (v * 100).toFixed(0) + '%',
-      tag: 'ефект.',
+      tag: 'газ',
       tc: 'var(--green)',
     },
   ],
-  // ── Ринкові ціни ──
   prices: [
-    { key: 'gp',    label: 'Ціна газу, грн/тис.м³',                   min: 5000,  max: 50000, step: 500,  fmt: (v) => fN(v) + ' грн',   tag: 'ринок', tc: 'var(--red)' },
-    { key: 'rdm',   label: 'РДН, грн/МВт·год',                        min: 1000,  max: 20000, step: 100,  fmt: (v) => fN(v) + ' грн',   tag: 'волат.', tc: 'var(--red)' },
-    { key: 'trans', label: 'Передача Укренерго, грн/МВт·год',         min: 500,   max: 5000,  step: 100,  fmt: (v) => fN(v) + ' грн',   tag: 'НКРЕКП', tc: 'var(--text3)' },
-    { key: 'distr', label: 'Розподіл Львівобленерго 2кл, грн/МВт·год', min: 1500, max: 4500,  step: 100,  fmt: (v) => fN(v) + ' грн',   tag: 'НКРЕКП', tc: 'var(--text3)' },
+    { key: 'gp', label: 'Ціна газу, грн/тис.м³', min: 5000, max: 50000, step: 500, fmt: (v) => fN(v) + ' грн', tag: 'ринок', tc: 'var(--red)' },
+    { key: 'rdm', label: 'РДН, грн/МВт·год', min: 1000, max: 20000, step: 100, fmt: (v) => fN(v) + ' грн', tag: 'волат.', tc: 'var(--red)' },
+    { key: 'trans', label: 'Передача Укренерго, грн/МВт·год', min: 500, max: 5000, step: 100, fmt: (v) => fN(v) + ' грн', tag: 'snapshot', tc: 'var(--text3)' },
+    { key: 'distr', label: 'Розподіл обленерго, грн/МВт·год', min: 1500, max: 4500, step: 100, fmt: (v) => fN(v) + ' грн', tag: 'snapshot', tc: 'var(--text3)' },
   ],
   heat: [
     { key: 'hp', label: 'Ціна тепла в мережу, грн/Гкал', min: 500, max: 5000, step: 100, fmt: (v) => fN(v) + ' грн', tag: 'ЛТЕ', tc: 'var(--green)' },
   ],
   el: [
-    { key: 'elB',  label: 'Базове ел. навантаження (без VRF), МВт', min: 0.1, max: 5, step: 0.05, fmt: (v) => v.toFixed(2) + ' МВт' },
-    { key: 'vrfW', label: 'VRF опалення взимку, МВт',               min: 0.0, max: 3, step: 0.05, fmt: (v) => v.toFixed(2) + ' МВт' },
-    { key: 'vrfS', label: 'VRF охолодження влітку, МВт',            min: 0.0, max: 3, step: 0.05, fmt: (v) => v.toFixed(2) + ' МВт' },
+    { key: 'elB', label: 'Базове ел. навантаження (без VRF), МВт', min: 0.1, max: 5, step: 0.05, fmt: (v) => v.toFixed(2) + ' МВт' },
+    { key: 'vrfW', label: 'VRF опалення взимку, МВт', min: 0.0, max: 3, step: 0.05, fmt: (v) => v.toFixed(2) + ' МВт' },
+    { key: 'vrfS', label: 'VRF охолодження влітку, МВт', min: 0.0, max: 3, step: 0.05, fmt: (v) => v.toFixed(2) + ' МВт' },
   ],
   inv: [
-    { key: 'capex', label: 'CAPEX «під ключ», млн грн',         min: 5e6,  max: 500e6, step: 1e6, fmt: (v) => fN(v / 1e6, 0) + ' млн', tag: 'орієнтир', tc: 'var(--amber)' },
-    { key: 'opex',  label: 'OPEX (ТО + персонал), % від CAPEX/рік', min: 1, max: 30,   step: 0.5, fmt: (v) => v.toFixed(1) + '%' },
-    { key: 'av',    label: 'Коефіцієнт доступності КГУ',        min: 0.5, max: 1,     step: 0.01, fmt: (v) => `${v.toFixed(2)} → ${fN(Math.round(8760 * v))} год` },
+    { key: 'capex', label: 'CAPEX «під ключ», млн грн', min: 5e6, max: 500e6, step: 1e6, fmt: (v) => fN(v / 1e6, 0) + ' млн', tag: 'орієнтир', tc: 'var(--amber)' },
+    { key: 'opex', label: 'OPEX (ТО + персонал), % від CAPEX/рік', min: 1, max: 30, step: 0.5, fmt: (v) => v.toFixed(1) + '%' },
+    { key: 'av', label: 'Коефіцієнт доступності КГУ', min: 0.5, max: 1, step: 0.01, fmt: (v) => `${v.toFixed(2)} → ${fN(Math.round(8760 * v))} год` },
   ],
 };
 
@@ -98,7 +102,7 @@ export default function ParamsScreen() {
 
   const pricesDerived = (
     <div className="derived">
-      <span className="d-label">Кінцева ціна для Об'єкту</span>
+      <span className="d-label">Кінцева ціна для об’єкта</span>
       <span className="d-val">{((P.rdm + P.trans + P.distr) / 1000).toFixed(2)} грн/кВт·год</span>
     </div>
   );
@@ -106,8 +110,7 @@ export default function ParamsScreen() {
   const heatExtra = (
     <div style={{ marginTop: 14 }}>
       <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--text2)', marginBottom: 8 }}>
-        Мережа бере тепло влітку?{' '}
-        <span className="tag" style={{ background: 'var(--green-bg)', color: 'var(--green)' }}>ЛТЕ</span>
+        Мережа бере тепло влітку? <span className="tag" style={{ background: 'var(--green-bg)', color: 'var(--green)' }}>ЛТЕ</span>
       </div>
       <div className="segs">
         <div className={`seg${P.sh === 0 ? ' active' : ''}`} onClick={() => setSH(0)}>Ні</div>
@@ -130,69 +133,50 @@ export default function ParamsScreen() {
     </>
   );
 
-  // Похідні параметри установки
-  const unitDerived = (
-    <div className="derived" style={{ marginTop: 10 }}>
-      <span className="d-label">Теплоелектричне відношення (α)</span>
-      <span className="d-val">{(P.thMW / P.elMW).toFixed(2)}</span>
-    </div>
-  );
-
   return (
     <div className="screen active">
       <div className="page-wrap">
         <div className="title-row">
-          <div className="scr-title">Параметри</div>
           <button className="reset-btn" onClick={resetToDefaults}>Скинути</button>
         </div>
 
-        {/* ── Налаштування проекту ── */}
-        <div className="sec">Налаштування проекту</div>
+        <div className="sec">Налаштування проєкту</div>
         <div className="card">
           {showRateLimit && (
             <div className="ib amber" style={{ marginBottom: 12 }}>
               API limit reached (429). Показані локальні дані `market-data.json`.
             </div>
           )}
-          <div className="sr">
-            <div className="sr-head">
-              <span className="sr-label">Назва проекту</span>
+
+          <div className="project-settings-row">
+            <div className="project-field">
+              <div className="project-field-label">Назва проєкту</div>
+              <input
+                type="text"
+                className="project-input"
+                value={P.projectName}
+                onChange={(e) => onChange('projectName', e.target.value)}
+                placeholder="Введіть назву проєкту..."
+              />
             </div>
-            <input
-              type="text"
-              className="project-input"
-              value={P.projectName}
-              onChange={(e) => onChange('projectName', e.target.value)}
-              placeholder="Введіть назву проекту..."
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: '8px',
-                border: '1px solid var(--border)',
-                background: 'var(--bg)',
-                color: 'var(--text)',
-                fontSize: 'var(--fs-base)',
-                marginTop: '6px'
-              }}
-            />
-          </div>
-          <div className="derived" style={{ marginTop: 12 }}>
-            <span className="d-label">Тип установки</span>
-            <span className="d-val">КГУ · {P.elMW.toFixed(1)} / {P.thMW.toFixed(1)} МВт</span>
-          </div>
-          <div className="derived" style={{ marginTop: 8 }}>
-            <span className="d-label">Регіон / оновлення даних</span>
-            <span className="d-val">{marketMeta.region || '—'} · {marketMeta.updated || '—'}</span>
+
+            <div className="project-meta-grid">
+              <div className="project-chip">
+                <span className="project-chip-label">Тип</span>
+                <span className="project-chip-value">КГУ · {P.elMW.toFixed(1)} / {P.thMW.toFixed(1)} МВт</span>
+              </div>
+              <div className="project-chip">
+                <span className="project-chip-label">Оновлено</span>
+                <span className="project-chip-value">{marketMeta.updated || '—'}</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* ── Установка КГУ (full width) ── */}
         <div className="sec">Установка КГУ</div>
-        <SliderGroup sliders={SLIDERS.unit} P={P} onChange={onChange} extra={unitDerived} />
+        <SliderGroup sliders={SLIDERS.unit} P={P} onChange={onChange} />
 
-        {/* ── Двоколонкова сітка ── */}
         <div className="params-grid">
-
           <div className="params-item params-prices">
             <div className="sec">Ціни</div>
             <SliderGroup sliders={SLIDERS.prices} P={P} onChange={onChange} extra={pricesDerived} />
@@ -204,7 +188,7 @@ export default function ParamsScreen() {
           </div>
 
           <div className="params-item params-el">
-            <div className="sec">Електричне навантаження Об'єкту</div>
+            <div className="sec">Електричне навантаження об’єкта</div>
             <SliderGroup sliders={SLIDERS.el} P={P} onChange={onChange} extra={elDerived} />
           </div>
 
@@ -212,12 +196,8 @@ export default function ParamsScreen() {
             <div className="sec">Тепло в мережу</div>
             <SliderGroup sliders={SLIDERS.heat} P={P} onChange={onChange} extra={heatExtra} />
           </div>
-
         </div>
       </div>
     </div>
   );
 }
-
-
-

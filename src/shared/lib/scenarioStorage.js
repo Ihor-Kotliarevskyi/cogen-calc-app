@@ -99,6 +99,24 @@ function downloadFile(content, filename, mimeType) {
   URL.revokeObjectURL(url);
 }
 
+export function downloadScenarioJSON(scenario, mode = 'cogen') {
+  const payload = [
+    {
+      mode,
+      name: scenario.name,
+      timestamp: scenario.timestamp,
+      date: new Date(scenario.timestamp).toLocaleDateString('uk-UA'),
+      parameters: scenario.P,
+      metrics: scenario.metrics,
+    },
+  ];
+  const safeName = (scenario.name || 'scenario')
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9\-_а-яіїєґ]/gi, '');
+  downloadFile(JSON.stringify(payload, null, 2), `${safeName || mode}-scenario.json`, 'application/json');
+}
+
 export function exportToJSON(scenarios, mode = 'cogen') {
   const data = scenarios.map((s) => ({
     mode,
@@ -147,4 +165,36 @@ export function exportToCSV(scenarios, mode = 'cogen') {
   ]);
   const csv = [headers.join(';'), ...rows.map((r) => r.join(';'))].join('\n');
   downloadFile('\uFEFF' + csv, 'cogen-scenarios.csv', 'text/csv;charset=utf-8');
+}
+
+export function importFromJSON(jsonText, mode = 'cogen') {
+  const parsed = JSON.parse(jsonText);
+  if (!Array.isArray(parsed)) {
+    throw new Error('JSON must be an array of scenarios');
+  }
+
+  const existing = getAll(mode);
+  const imported = parsed
+    .map((item, index) => {
+      const parameters = item?.parameters ?? item?.P;
+      const metrics = item?.metrics;
+      if (!parameters || !metrics) return null;
+
+      return {
+        id: `${Date.now().toString(36)}-${index}-${Math.random().toString(36).slice(2, 6)}`,
+        name: item?.name?.trim?.() || `Імпортований сценарій ${index + 1}`,
+        mode,
+        timestamp: item?.timestamp ? Number(item.timestamp) : Date.now() + index,
+        P: { ...parameters },
+        metrics: { ...metrics },
+      };
+    })
+    .filter(Boolean);
+
+  if (!imported.length) {
+    throw new Error('No valid scenarios found in JSON');
+  }
+
+  setAll(mode, [...existing, ...imported]);
+  return imported.length;
 }

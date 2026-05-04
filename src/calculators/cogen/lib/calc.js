@@ -1,5 +1,5 @@
 ﻿export const DEF = {
-  projectName: 'Мій Енерго-Проєкт',
+  projectName: 'Проєкт когенерації',
   elMW: 1.0,
   thMW: 1.1,
   eff: 0.4,

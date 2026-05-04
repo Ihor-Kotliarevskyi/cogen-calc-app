@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useCalc } from './context/CogenContext.jsx';
 import Header from '../../shared/components/Header.jsx';
 import TabBar from '../../shared/components/TabBar.jsx';
@@ -9,15 +9,17 @@ import BalanceScreen from './components/BalanceScreen.jsx';
 import CashflowScreen from './components/CashflowScreen.jsx';
 import ScenariosScreen from './components/ScenariosScreen.jsx';
 import SavedScenariosScreen from './components/SavedScenariosScreen.jsx';
+import FaqScreen from './components/FaqScreen.jsx';
 import { CALC_MODES } from '../../lib/calcModes.js';
 
 const TABS = [
   { key: 'params', label: 'Параметри' },
   { key: 'dash', label: 'Результат' },
   { key: 'balance', label: 'Баланси' },
-  { key: 'cf', label: 'CF / Графік' },
+  { key: 'cf', label: 'Графік' },
   { key: 'sc', label: 'Сценарії' },
   { key: 'saved', label: 'Збережені' },
+  { key: 'faq', label: 'FAQ' },
 ];
 
 export default function CogenApp({ calcMode, onModeChange }) {
@@ -25,7 +27,6 @@ export default function CogenApp({ calcMode, onModeChange }) {
   const { P, loading } = useCalc();
 
   useAutoSave(P, 'cogen');
-  const subtitle = useMemo(() => 'Когенераційний модуль', []);
 
   if (loading) {
     return (
@@ -37,7 +38,7 @@ export default function CogenApp({ calcMode, onModeChange }) {
 
   return (
     <div className="app">
-      <Header calcMode={calcMode} onModeChange={onModeChange} modes={CALC_MODES} subtitle={subtitle} />
+      <Header calcMode={calcMode} onModeChange={onModeChange} modes={CALC_MODES} title="Когенерація" />
       <TabBar tabs={TABS} active={activeTab} onChange={setActiveTab} />
       <div className="content">
         {activeTab === 'params' && <ParamsScreen />}
@@ -45,7 +46,8 @@ export default function CogenApp({ calcMode, onModeChange }) {
         {activeTab === 'balance' && <BalanceScreen />}
         {activeTab === 'cf' && <CashflowScreen />}
         {activeTab === 'sc' && <ScenariosScreen />}
-        {activeTab === 'saved' && <SavedScenariosScreen />}
+        {activeTab === 'saved' && <SavedScenariosScreen onLoadScenario={() => setActiveTab('params')} />}
+        {activeTab === 'faq' && <FaqScreen />}
       </div>
     </div>
   );

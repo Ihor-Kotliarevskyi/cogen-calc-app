@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { useSolar } from '../context/SolarContext.jsx';
 import { fN } from '../../../shared/lib/formatters.js';
 
@@ -8,8 +8,8 @@ const SLIDERS = [
   { key: 'degradation', label: 'Деградація, %/рік', min: 0.1, max: 2, step: 0.1, fmt: (v) => `${v.toFixed(1)}%` },
   { key: 'selfUseShare', label: 'Частка власного споживання', min: 0, max: 1, step: 0.05, fmt: (v) => `${(v * 100).toFixed(0)}%` },
   { key: 'gridPrice', label: 'Ціна заміщення з мережі, грн/кВт·год', min: 2, max: 12, step: 0.1, fmt: (v) => `${v.toFixed(2)} грн` },
-  { key: 'feedInTariff', label: 'Зелений тариф / базовий продаж, грн/кВт·год', min: 1, max: 10, step: 0.1, fmt: (v) => `${v.toFixed(2)} грн` },
-  { key: 'reserveShare', label: 'Частка генерації в резервування (BESS-модель)', min: 0, max: 1, step: 0.05, fmt: (v) => `${(v * 100).toFixed(0)}%` },
+  { key: 'feedInTariff', label: 'Тариф продажу, грн/кВт·год', min: 1, max: 10, step: 0.1, fmt: (v) => `${v.toFixed(2)} грн` },
+  { key: 'reserveShare', label: 'Частка генерації в резервування', min: 0, max: 1, step: 0.05, fmt: (v) => `${(v * 100).toFixed(0)}%` },
   { key: 'reserveEfficiency', label: 'ККД циклу резервування', min: 0.5, max: 1, step: 0.01, fmt: (v) => `${(v * 100).toFixed(0)}%` },
   { key: 'reservePeakPremium', label: 'Премія пікового продажу, грн/кВт·год', min: 0, max: 6, step: 0.1, fmt: (v) => `${v.toFixed(2)} грн` },
   { key: 'capex', label: 'CAPEX, млн грн', min: 2e6, max: 800e6, step: 0.5e6, fmt: (v) => `${fN(v / 1e6, 1)} млн` },
@@ -24,34 +24,39 @@ export default function SolarParamsScreen() {
     <div className="screen active">
       <div className="page-wrap">
         <div className="title-row">
-          <div className="scr-title">Параметри</div>
           <button className="reset-btn" onClick={resetToDefaults}>Скинути</button>
         </div>
 
-        <div className="sec">Налаштування проекту</div>
+        <div className="sec">Налаштування проєкту</div>
         <div className="card">
           {showRateLimit && (
             <div className="ib amber" style={{ marginBottom: 12 }}>
               API limit reached (429). Показані локальні дані `market-data.json`.
             </div>
           )}
-          <div className="sr">
-            <div className="sr-head"><span className="sr-label">Назва проєкту</span></div>
-            <input
-              type="text"
-              className="project-input"
-              value={P.projectName}
-              onChange={(e) => dispatch({ type: 'SET_PARAM', key: 'projectName', value: e.target.value })}
-              placeholder="Введіть назву проєкту..."
-            />
-          </div>
-          <div className="derived" style={{ marginTop: 12 }}>
-            <span className="d-label">Тип установки</span>
-            <span className="d-val">СЕС · {P.pvMW.toFixed(1)} МВт</span>
-          </div>
-          <div className="derived" style={{ marginTop: 8 }}>
-            <span className="d-label">Регіон / оновлення даних</span>
-            <span className="d-val">{marketMeta.region || '—'} · {marketMeta.updated || '—'}</span>
+
+          <div className="project-settings-row">
+            <div className="project-field">
+              <div className="project-field-label">Назва проєкту</div>
+              <input
+                type="text"
+                className="project-input"
+                value={P.projectName}
+                onChange={(e) => dispatch({ type: 'SET_PARAM', key: 'projectName', value: e.target.value })}
+                placeholder="Введіть назву проєкту..."
+              />
+            </div>
+
+            <div className="project-meta-grid">
+              <div className="project-chip">
+                <span className="project-chip-label">Тип</span>
+                <span className="project-chip-value">СЕС · {P.pvMW.toFixed(1)} МВт</span>
+              </div>
+              <div className="project-chip">
+                <span className="project-chip-label">Оновлено</span>
+                <span className="project-chip-value">{marketMeta.updated || '—'}</span>
+              </div>
+            </div>
           </div>
         </div>
 
