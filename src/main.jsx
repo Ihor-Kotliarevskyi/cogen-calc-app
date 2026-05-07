@@ -5,6 +5,10 @@ import './styles.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {
+      // Ignore SW registration failures and keep app booting normally.
+    });
+  });
 }

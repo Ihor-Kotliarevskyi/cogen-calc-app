@@ -36,9 +36,9 @@ function normalizeFromApi(data) {
 export async function fetchTariffSnapshot() {
   const candidates = [];
   let lastError = null;
-  if (API_URL) candidates.push(API_URL);
   candidates.push('/api/tariffs');
   candidates.push('/.netlify/functions/tariffs');
+  if (API_URL) candidates.push(API_URL);
 
   for (const endpoint of candidates) {
     try {

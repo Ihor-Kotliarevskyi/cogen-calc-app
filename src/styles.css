@@ -1734,6 +1734,12 @@ canvas {
   .btn-export { flex: 1 1 calc(50% - 4px); }
 }
 
+@media (max-width: 767px) {
+  .comparison-table-desktop {
+    display: none;
+  }
+}
+
 /* в”Ђв”Ђ Print report в”Ђв”Ђ */
 .print-report { display: none; }
 

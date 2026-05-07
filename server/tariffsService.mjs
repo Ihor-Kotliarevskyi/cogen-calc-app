@@ -3,13 +3,14 @@ import path from 'node:path';
 
 const ENERGY_MAP_BASE = 'https://energy-map.info';
 const DEFAULT_TTL_HOURS = 24;
-const SNAPSHOT_BLOB_KEY = 'tariffs-snapshot-v1';
-const SNAPSHOT_BLOB_STORE = 'energy-roi-calc';
+const SNAPSHOT_KEY = 'tariffs-snapshot-v1';
+const SNAPSHOT_NETLIFY_STORE = 'energy-roi-calc';
+const SNAPSHOT_VERCEL_PATH = `snapshots/${SNAPSHOT_KEY}.json`;
 
 let memoryCache = null;
 let lastSyncAt = 0;
 let syncInFlight = null;
-let blobStorePromise = null;
+let persistenceDriverPromise = null;
 
 function toNumber(value) {
   if (value == null) return null;
@@ -104,45 +105,119 @@ function latestNumberFromCsv(text, valueColumnIndex = 1, filters = []) {
 async function readLocalSnapshot() {
   const localPath = path.resolve(process.cwd(), 'public', 'market-data.json');
   const raw = await fs.readFile(localPath, 'utf8');
-  const normalized = raw.replace(/^\uFEFF/, '');
-  return JSON.parse(normalized);
+  return JSON.parse(raw.replace(/^\uFEFF/, ''));
 }
 
-async function getBlobStore() {
-  if (blobStorePromise) return blobStorePromise;
-  blobStorePromise = (async () => {
-    try {
-      const { getStore } = await import('@netlify/blobs');
-      return getStore(SNAPSHOT_BLOB_STORE);
-    } catch {
-      return null;
-    }
-  })();
-  return blobStorePromise;
-}
+async function createVercelBlobDriver() {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return null;
 
-async function readPersistedSnapshot() {
-  const store = await getBlobStore();
-  if (!store) return null;
   try {
-    const data = await store.get(SNAPSHOT_BLOB_KEY, { type: 'json' });
-    return data && typeof data === 'object' ? data : null;
+    const { list, put } = await import('@vercel/blob');
+    return {
+      name: 'vercel-blob',
+      async read() {
+        try {
+          const { blobs } = await list({
+            prefix: SNAPSHOT_VERCEL_PATH,
+            limit: 10,
+            token: process.env.BLOB_READ_WRITE_TOKEN,
+          });
+          const blob = blobs.find((item) => item.pathname === SNAPSHOT_VERCEL_PATH);
+          if (!blob) return null;
+
+          const res = await fetch(blob.url, { cache: 'no-store' });
+          if (!res.ok) return null;
+
+          const data = await res.json();
+          return data && typeof data === 'object' ? data : null;
+        } catch {
+          return null;
+        }
+      },
+      async write(snapshot) {
+        try {
+          await put(SNAPSHOT_VERCEL_PATH, JSON.stringify(snapshot), {
+            access: 'public',
+            allowOverwrite: true,
+            addRandomSuffix: false,
+            contentType: 'application/json; charset=utf-8',
+            token: process.env.BLOB_READ_WRITE_TOKEN,
+          });
+          return true;
+        } catch {
+          return false;
+        }
+      },
+    };
   } catch {
     return null;
   }
 }
 
-async function writePersistedSnapshot(snapshot) {
-  const store = await getBlobStore();
-  if (!store) return false;
+async function createNetlifyBlobDriver() {
   try {
-    await store.set(SNAPSHOT_BLOB_KEY, JSON.stringify(snapshot), {
-      metadata: { updatedAt: new Date().toISOString() },
-    });
-    return true;
+    const { getStore } = await import('@netlify/blobs');
+    const store = getStore(SNAPSHOT_NETLIFY_STORE);
+
+    return {
+      name: 'netlify-blob',
+      async read() {
+        try {
+          const data = await store.get(SNAPSHOT_KEY, { type: 'json' });
+          return data && typeof data === 'object' ? data : null;
+        } catch {
+          return null;
+        }
+      },
+      async write(snapshot) {
+        try {
+          await store.set(SNAPSHOT_KEY, JSON.stringify(snapshot), {
+            metadata: { updatedAt: new Date().toISOString() },
+          });
+          return true;
+        } catch {
+          return false;
+        }
+      },
+    };
   } catch {
-    return false;
+    return null;
   }
+}
+
+async function getPersistenceDriver() {
+  if (persistenceDriverPromise) return persistenceDriverPromise;
+
+  persistenceDriverPromise = (async () => {
+    const vercelDriver = await createVercelBlobDriver();
+    if (vercelDriver) return vercelDriver;
+
+    const netlifyDriver = await createNetlifyBlobDriver();
+    if (netlifyDriver) return netlifyDriver;
+
+    return null;
+  })();
+
+  return persistenceDriverPromise;
+}
+
+async function readPersistedSnapshot() {
+  const driver = await getPersistenceDriver();
+  if (!driver) return { snapshot: null, storage: null };
+
+  const snapshot = await driver.read();
+  return {
+    snapshot,
+    storage: snapshot ? driver.name : null,
+  };
+}
+
+async function writePersistedSnapshot(snapshot) {
+  const driver = await getPersistenceDriver();
+  if (!driver) return null;
+
+  const persisted = await driver.write(snapshot);
+  return persisted ? driver.name : null;
 }
 
 async function fetchEnergyMapCsv({ token, uuid, format = 'csv', language = 'uk' }) {
@@ -282,7 +357,7 @@ async function syncWithFallback(localSnapshot) {
 async function getSnapshotInternal({ forceSync = false } = {}) {
   const now = Date.now();
   const localSnapshot = await readLocalSnapshot();
-  const persistedSnapshot = await readPersistedSnapshot();
+  const { snapshot: persistedSnapshot, storage: persistedStorage } = await readPersistedSnapshot();
   const baseSnapshot = persistedSnapshot || localSnapshot;
 
   if (!forceSync && memoryCache && !shouldAutoSync(now)) {
@@ -295,7 +370,7 @@ async function getSnapshotInternal({ forceSync = false } = {}) {
       meta: {
         stale: false,
         source: persistedSnapshot ? 'persisted-snapshot' : 'local-snapshot',
-        cache: persistedSnapshot ? 'blob' : 'file',
+        cache: persistedSnapshot ? persistedStorage : 'file',
       },
     };
     memoryCache = response;
@@ -304,9 +379,10 @@ async function getSnapshotInternal({ forceSync = false } = {}) {
 
   const synced = await syncWithFallback(baseSnapshot);
   if (!synced?.meta?.fallback && synced?.meta?.source === 'energy-map-api') {
-    const persisted = await writePersistedSnapshot(synced.snapshot);
-    synced.meta = { ...(synced.meta || {}), persisted: persisted ? 'blob' : 'none' };
+    const persistedStorageName = await writePersistedSnapshot(synced.snapshot);
+    synced.meta = { ...(synced.meta || {}), persisted: persistedStorageName || 'none' };
   }
+
   lastSyncAt = now;
   memoryCache = synced;
   return synced;

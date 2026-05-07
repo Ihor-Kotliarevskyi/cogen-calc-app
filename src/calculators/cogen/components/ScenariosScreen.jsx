@@ -10,6 +10,7 @@ export default function ScenariosScreen() {
   const scenarios = [
     {
       title: 'Консервативний',
+      shortTitle: 'Консерват.',
       badge: 'Мережа не бере влітку',
       bc: 'var(--bg3)',
       tc: 'var(--text2)',
@@ -18,6 +19,7 @@ export default function ScenariosScreen() {
     },
     {
       title: 'Базовий (поточний)',
+      shortTitle: 'Базовий',
       badge: 'Ваші параметри',
       bc: 'var(--green-bg)',
       tc: 'var(--green)',
@@ -27,6 +29,7 @@ export default function ScenariosScreen() {
     },
     {
       title: 'Оптимістичний',
+      shortTitle: 'Оптиміст.',
       badge: 'РДН 8 грн, газ -10%, тепло 2500',
       bc: 'var(--blue-bg)',
       tc: 'var(--blue)',
@@ -47,6 +50,7 @@ export default function ScenariosScreen() {
     },
     {
       title: 'Тільки електрика',
+      shortTitle: 'Електрика',
       badge: 'Без продажу тепла',
       bc: 'var(--amber-bg)',
       tc: 'var(--amber)',
@@ -114,14 +118,15 @@ export default function ScenariosScreen() {
           ))}
         </div>
 
-        <div className="sec">Порівняльна таблиця</div>
-        <div className="card" style={{ padding: 12 }}>
+        <div className="sec comparison-table-desktop">Порівняльна таблиця</div>
+
+        <div className="card comparison-table comparison-table-desktop" style={{ padding: 12 }}>
           <table className="st">
             <thead>
               <tr>
                 <th></th>
                 {scenarios.map((scenario) => (
-                  <th key={scenario.title} style={{ color: scenario.tc, fontSize: 10 }}>{scenario.title.split(' ')[0]}</th>
+                  <th key={scenario.title} style={{ color: scenario.tc, fontSize: 10 }}>{scenario.shortTitle}</th>
                 ))}
               </tr>
             </thead>
@@ -137,6 +142,7 @@ export default function ScenariosScreen() {
             </tbody>
           </table>
         </div>
+
       </div>
     </div>
   );
