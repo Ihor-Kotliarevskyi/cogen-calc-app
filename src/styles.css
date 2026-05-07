@@ -1014,7 +1014,6 @@ input[type="range"]::-webkit-slider-thumb:active {
 .pnl-row.tot {
   border-top: 1px solid var(--border);
   border-bottom: none;
-  margin-top: 4px;
   padding-top: 11px;
 }
 
