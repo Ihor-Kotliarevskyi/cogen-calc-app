@@ -1,8 +1,18 @@
-const CACHE = 'cogen-v1';
-const ASSETS = ['/', '/index.html', '/manifest.json'];
+const CACHE = 'cogen-v2';
+const ASSETS = ['/', '/index.html', '/manifest.json', '/favicon.svg'];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));
+  event.waitUntil(
+    caches.open(CACHE).then(async (cache) => {
+      await Promise.allSettled(
+        ASSETS.map(async (asset) => {
+          const response = await fetch(asset, { cache: 'no-store' });
+          if (!response.ok) throw new Error(`Failed to cache ${asset}: ${response.status}`);
+          await cache.put(asset, response);
+        }),
+      );
+    }),
+  );
   self.skipWaiting();
 });
 
