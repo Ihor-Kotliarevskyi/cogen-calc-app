@@ -1,60 +1,73 @@
-﻿import React from 'react';
+import React from 'react';
 import { useCalc } from '../context/CogenContext.jsx';
 import { calc } from '../lib/calc.js';
-import { fN, fM, fG } from '../../../shared/lib/formatters.js';
+import { fG, fM, fN } from '../../../shared/lib/formatters.js';
 
 export default function ScenariosScreen() {
-  const { P, result: r } = useCalc();
+  const { P, result, dispatch } = useCalc();
 
-  const sc = (ov) => calc({ ...P, ...ov });
+  const buildScenario = (overrides) => calc({ ...P, ...overrides });
   const scenarios = [
     {
       title: 'Консервативний',
       badge: 'Мережа не бере влітку',
       bc: 'var(--bg3)',
       tc: 'var(--text2)',
-      r: sc({ sh: 0, hp: 800 }),
-      best: false,
+      overrides: { sh: 0, hp: 800 },
+      result: buildScenario({ sh: 0, hp: 800 }),
     },
     {
       title: 'Базовий (поточний)',
       badge: 'Ваші параметри',
       bc: 'var(--green-bg)',
       tc: 'var(--green)',
-      r,
+      overrides: {},
+      result,
       best: true,
     },
     {
       title: 'Оптимістичний',
-      badge: 'РДН 8грн, газ -10%, тепло 2500',
+      badge: 'РДН 8 грн, газ -10%, тепло 2500',
       bc: 'var(--blue-bg)',
       tc: 'var(--blue)',
-      r: sc({
+      overrides: {
+        rdm: 8000,
+        gp: Math.round(P.gp * 0.9),
+        hp: 2500,
+        sh: 1,
+        av: 0.95,
+      },
+      result: buildScenario({
         rdm: 8000,
         gp: Math.round(P.gp * 0.9),
         hp: 2500,
         sh: 1,
         av: 0.95,
       }),
-      best: false,
     },
     {
       title: 'Тільки електрика',
       badge: 'Без продажу тепла',
       bc: 'var(--amber-bg)',
       tc: 'var(--amber)',
-      r: sc({ hp: 0, sh: 0 }),
-      best: false,
+      overrides: { hp: 0, sh: 0 },
+      result: buildScenario({ hp: 0, sh: 0 }),
     },
   ];
 
   const metrics = [
-    { l: 'Собів. ел.', f: (s) => fG(s.ecg, 2) },
-    { l: 'Дохід, млн', f: (s) => fM(s.tot, 1) },
-    { l: 'Прибуток, млн', f: (s) => fM(s.net, 1) },
-    { l: 'Окупність', f: (s) => (s.pb ? s.pb.toFixed(1) + ' р.' : '∞') },
-    { l: 'NPV 15р.', f: (s) => fN(s.cf[15], 1) + ' млн' },
+    { label: 'Собів. ел.', format: (r) => fG(r.ecg, 2) },
+    { label: 'Дохід, млн', format: (r) => fM(r.tot, 1) },
+    { label: 'Прибуток, млн', format: (r) => fM(r.net, 1) },
+    { label: 'Окупність', format: (r) => (r.pb ? `${r.pb.toFixed(1)} р.` : '∞') },
+    { label: 'NPV 15р.', format: (r) => `${fN(r.cf[15], 1)} млн` },
   ];
+
+  const applyScenario = (overrides) => {
+    Object.entries(overrides).forEach(([key, value]) => {
+      dispatch({ type: 'SET_PARAM', key, value });
+    });
+  };
 
   return (
     <div className="screen active">
@@ -62,32 +75,41 @@ export default function ScenariosScreen() {
         <div className="scr-title" style={{ marginBottom: 16 }}>Сценарії</div>
 
         <div className="sc-cards-grid">
-          {scenarios.map((s, i) => (
-            <div key={i} className={`card${s.best ? ' best' : ''}`}>
-              <div className="sc-badge" style={{ background: s.bc, color: s.tc }}>{s.badge}</div>
-              <div className="sc-title">{s.title}</div>
+          {scenarios.map((scenario) => (
+            <div key={scenario.title} className={`card${scenario.best ? ' best' : ''}`}>
+              <div className="sc-card-head">
+                <div className="sc-title">{scenario.title}</div>
+                <div className="sc-badge" style={{ background: scenario.bc, color: scenario.tc }}>{scenario.badge}</div>
+              </div>
+
               <div className="sc-row">
                 <span className="sc-k">Собів. ел.</span>
-                <span className="sc-v" style={{ color: s.r.ecg < s.r.ep ? 'var(--green)' : 'var(--red)' }}>
-                  {fG(s.r.ecg)}
+                <span className="sc-v" style={{ color: scenario.result.ecg < scenario.result.ep ? 'var(--green)' : 'var(--red)' }}>
+                  {fG(scenario.result.ecg)}
                 </span>
               </div>
               <div className="sc-row">
                 <span className="sc-k">Тепло в мережу</span>
-                <span className="sc-v">{fN(s.r.gcT, 0)} Гкал</span>
+                <span className="sc-v">{fN(scenario.result.gcT, 0)} Гкал</span>
               </div>
               <div className="sc-row">
                 <span className="sc-k">Прибуток / рік</span>
-                <span className="sc-v" style={{ color: s.r.net > 0 ? 'var(--green)' : 'var(--red)' }}>
-                  {fM(s.r.net)}
+                <span className="sc-v" style={{ color: scenario.result.net > 0 ? 'var(--green)' : 'var(--red)' }}>
+                  {fM(scenario.result.net)}
                 </span>
               </div>
               <div className="sc-row">
                 <span className="sc-k">Окупність</span>
-                <span className="sc-v" style={{ color: s.r.pb ? (s.r.pb < 5 ? 'var(--green)' : 'var(--amber)') : 'var(--red)' }}>
-                  {s.r.pb ? s.r.pb.toFixed(1) + ' р.' : '∞'}
+                <span className="sc-v" style={{ color: scenario.result.pb ? (scenario.result.pb < 5 ? 'var(--green)' : 'var(--amber)') : 'var(--red)' }}>
+                  {scenario.result.pb ? `${scenario.result.pb.toFixed(1)} р.` : '∞'}
                 </span>
               </div>
+
+              {!scenario.best && (
+                <div className="saved-card-actions">
+                  <button className="btn-secondary" onClick={() => applyScenario(scenario.overrides)}>Застосувати</button>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -98,17 +120,17 @@ export default function ScenariosScreen() {
             <thead>
               <tr>
                 <th></th>
-                {scenarios.map((s, i) => (
-                  <th key={i} style={{ color: s.tc, fontSize: 10 }}>{s.title.split(' ')[0]}</th>
+                {scenarios.map((scenario) => (
+                  <th key={scenario.title} style={{ color: scenario.tc, fontSize: 10 }}>{scenario.title.split(' ')[0]}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {metrics.map((m, mi) => (
-                <tr key={mi}>
-                  <td>{m.l}</td>
-                  {scenarios.map((s, si) => (
-                    <td key={si}>{m.f(s.r)}</td>
+              {metrics.map((metric) => (
+                <tr key={metric.label}>
+                  <td>{metric.label}</td>
+                  {scenarios.map((scenario) => (
+                    <td key={`${scenario.title}-${metric.label}`}>{metric.format(scenario.result)}</td>
                   ))}
                 </tr>
               ))}
@@ -119,5 +141,3 @@ export default function ScenariosScreen() {
     </div>
   );
 }
-
-

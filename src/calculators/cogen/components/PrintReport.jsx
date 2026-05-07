@@ -67,8 +67,8 @@ export default function PrintReport({ scenario }) {
             <tr><td>Ціна тепла в мережу</td><td>{fN(P.hp)} грн/Гкал</td></tr>
             <tr><td>Мережа бере тепло влітку</td><td>{P.sh === 0 ? 'Ні' : P.sh === 0.5 ? '50%' : 'Так'}</td></tr>
             <tr><td>Базове ел. навантаження</td><td>{P.elB.toFixed(2)} МВт</td></tr>
-            <tr><td>VRF опалення (зима)</td><td>{P.vrfW.toFixed(2)} МВт</td></tr>
-            <tr><td>VRF охолодження (літо)</td><td>{P.vrfS.toFixed(2)} МВт</td></tr>
+            <tr><td>Додаткове навантаження взимку</td><td>{P.vrfW.toFixed(2)} МВт</td></tr>
+            <tr><td>Додаткове навантаження влітку</td><td>{P.vrfS.toFixed(2)} МВт</td></tr>
             <tr><td>CAPEX</td><td>{fM(P.capex, 0)}</td></tr>
             <tr><td>OPEX</td><td>{P.opex.toFixed(1)}% від CAPEX</td></tr>
             <tr><td>Доступність КГУ</td><td>{P.av.toFixed(2)} ({fN(r.h)} год/рік)</td></tr>

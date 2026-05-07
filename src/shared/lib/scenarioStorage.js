@@ -52,11 +52,25 @@ export function getScenarios(mode = 'cogen') {
   return getAll(mode).sort((a, b) => b.timestamp - a.timestamp);
 }
 
+function makeUniqueScenarioName(name, scenarios) {
+  const baseName = name.trim();
+  const existingNames = new Set(scenarios.map((scenario) => scenario.name?.trim()).filter(Boolean));
+  if (!existingNames.has(baseName)) return baseName;
+
+  let index = 2;
+  while (existingNames.has(`${baseName} ${index}`)) {
+    index += 1;
+  }
+
+  return `${baseName} ${index}`;
+}
+
 export function saveScenario(name, P, result, mode = 'cogen') {
   const scenarios = getAll(mode);
+  const uniqueName = makeUniqueScenarioName(name, scenarios);
   const entry = {
     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    name,
+    name: uniqueName,
     mode,
     timestamp: Date.now(),
     P: { ...P },
@@ -149,7 +163,7 @@ export function exportToCSV(scenarios, mode = 'cogen') {
   const headers = [
     'Назва', 'Дата',
     'Газ (грн/тис.м³)', 'РДН (грн/МВт·год)', 'Передача', 'Розподіл',
-    'Тепло (грн/Гкал)', 'Літо тепло', 'База ел. (МВт)', 'VRF зима', 'VRF літо',
+    'Тепло (грн/Гкал)', 'Літо тепло', 'База ел. (МВт)', 'Опалення зима', 'Охолодження літо',
     'CAPEX (грн)', 'OPEX (%)', 'Доступність',
     'Собів. ел.', 'Ціна мережі', 'Окупність (р.)', 'Дохід (грн)', 'Прибуток (грн)', 'Тепло (Гкал)',
   ];
