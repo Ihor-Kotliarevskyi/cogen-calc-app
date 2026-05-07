@@ -5,13 +5,14 @@ export default function TabBar({ tabs, active, onChange }) {
     <div className="tabbar">
       <div className="tabbar-inner">
         {tabs.map((t) => (
-          <div
+          <button
             key={t.key}
+            type="button"
             className={`tab${active === t.key ? ' active' : ''}`}
             onClick={() => onChange(t.key)}
           >
             {t.label}
-          </div>
+          </button>
         ))}
       </div>
     </div>

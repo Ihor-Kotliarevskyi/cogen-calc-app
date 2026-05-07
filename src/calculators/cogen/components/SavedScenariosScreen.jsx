@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { useCalc } from '../context/CogenContext.jsx';
-import { fM, fG } from '../../../shared/lib/formatters.js';
+import { fG, fM } from '../../../shared/lib/formatters.js';
 import Icon from '../../../shared/components/Icon.jsx';
 import {
   deleteScenario,
@@ -22,6 +22,7 @@ export default function SavedScenariosScreen({ onLoadScenario }) {
   const fileInputRef = useRef(null);
 
   const refresh = useCallback(() => setScenarios(getScenarios('cogen')), []);
+  const defaultScenarioName = P.projectName?.trim?.() || '';
 
   const buildCurrentScenario = () => ({
     name: 'Поточний сценарій',
@@ -43,6 +44,7 @@ export default function SavedScenariosScreen({ onLoadScenario }) {
       setError('Вкажіть назву сценарію.');
       return;
     }
+
     saveScenario(trimmed, P, result, 'cogen');
     setName('');
     setError('');
@@ -71,6 +73,12 @@ export default function SavedScenariosScreen({ onLoadScenario }) {
 
   const handlePrintCurrent = () => handlePrint(buildCurrentScenario());
 
+  const openSaveModal = () => {
+    setName(defaultScenarioName);
+    setError('');
+    setShowSaveModal(true);
+  };
+
   const handleImportClick = () => fileInputRef.current?.click();
 
   const handleImportFile = async (event) => {
@@ -88,7 +96,7 @@ export default function SavedScenariosScreen({ onLoadScenario }) {
     }
   };
 
-  const fDate = (ts) => new Date(ts).toLocaleDateString('uk-UA', {
+  const formatDate = (ts) => new Date(ts).toLocaleDateString('uk-UA', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -107,24 +115,34 @@ export default function SavedScenariosScreen({ onLoadScenario }) {
               type="text"
               placeholder="Назва сценарію..."
               value={name}
-              onChange={(e) => { setName(e.target.value); setError(''); }}
+              onChange={(e) => {
+                setName(e.target.value);
+                setError('');
+              }}
               onKeyDown={(e) => e.key === 'Enter' && handleSave()}
               autoFocus
             />
             <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
               <button className="btn-primary" onClick={handleSave}>Зберегти</button>
-              <button className="btn-secondary" onClick={() => { setShowSaveModal(false); setName(''); setError(''); }}>Скасувати</button>
+              <button className="btn-secondary" onClick={() => {
+                setShowSaveModal(false);
+                setName('');
+                setError('');
+              }}
+              >
+                Скасувати
+              </button>
             </div>
             {error && <div className="form-error">{error}</div>}
             <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 8 }}>
-              Собів.: {fG(result.ecg)} · Окупність: {result.pb ? result.pb.toFixed(1) + ' р.' : '∞'} · Прибуток: {fM(result.net)}
+              Собів.: {fG(result.ecg)} · Окупність: {result.pb ? `${result.pb.toFixed(1)} р.` : '∞'} · Прибуток: {fM(result.net)}
             </div>
           </div>
         )}
 
         <div className="card">
           <div className="saved-toolbar">
-            <button className="btn-primary" onClick={() => setShowSaveModal(true)}>Зберегти сценарій</button>
+            <button className="btn-primary" onClick={openSaveModal}>Зберегти сценарій</button>
             <button className="btn-export" onClick={() => exportToJSON(scenarios, 'cogen')}>JSON</button>
             <button className="btn-export" onClick={() => exportToCSV(scenarios, 'cogen')}>CSV</button>
             <button className="btn-export" onClick={handleImportClick}>Імпорт JSON</button>
@@ -146,32 +164,32 @@ export default function SavedScenariosScreen({ onLoadScenario }) {
             <div style={{ fontSize: 13, color: 'var(--text2)' }}>Збережених сценаріїв ще немає</div>
           </div>
         ) : (
-          scenarios.map((s) => {
-            const pbColor = s.metrics.pb
-              ? (s.metrics.pb < 4 ? 'var(--green)' : s.metrics.pb < 7 ? 'var(--amber)' : 'var(--red)')
+          scenarios.map((scenario) => {
+            const pbColor = scenario.metrics.pb
+              ? (scenario.metrics.pb < 4 ? 'var(--green)' : scenario.metrics.pb < 7 ? 'var(--amber)' : 'var(--red)')
               : 'var(--red)';
-            const netColor = s.metrics.net > 0 ? 'var(--green)' : 'var(--red)';
+            const netColor = scenario.metrics.net > 0 ? 'var(--green)' : 'var(--red)';
 
             return (
-              <div key={s.id} className="card sc-saved-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
-                    <div className="sc-saved-name">{s.name}</div>
-                    <div className="sc-saved-date">{fDate(s.timestamp)}</div>
+              <div key={scenario.id} className="card sc-saved-card">
+                <div className="saved-card-head">
+                  <div className="saved-card-title-wrap">
+                    <div className="sc-saved-name">{scenario.name}</div>
+                    <div className="sc-saved-date">{formatDate(scenario.timestamp)}</div>
                   </div>
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    <button className="btn-icon" title="Завантажити JSON" onClick={() => downloadScenarioJSON(s, 'cogen')}><Icon name="download" /></button>
-                    <button className="btn-icon" title="Друк" onClick={() => handlePrint(s)}><Icon name="print" /></button>
-                    <button className="btn-icon btn-icon-danger" title="Видалити" onClick={() => handleDelete(s.id)}><Icon name="trash" /></button>
+                  <div className="saved-card-tools">
+                    <button className="btn-icon" title="Завантажити JSON" onClick={() => downloadScenarioJSON(scenario, 'cogen')}><Icon name="download" /></button>
+                    <button className="btn-icon" title="Друк" onClick={() => handlePrint(scenario)}><Icon name="print" /></button>
+                    <button className="btn-icon btn-icon-danger" title="Видалити" onClick={() => handleDelete(scenario.id)}><Icon name="trash" /></button>
                   </div>
                 </div>
                 <div className="sc-saved-metrics">
-                  <div className="sc-saved-metric"><span className="sc-saved-metric-label">Собів.</span><span style={{ color: s.metrics.ecg < s.metrics.ep ? 'var(--green)' : 'var(--red)' }}>{fG(s.metrics.ecg)}</span></div>
-                  <div className="sc-saved-metric"><span className="sc-saved-metric-label">Окупн.</span><span style={{ color: pbColor }}>{s.metrics.pb ? s.metrics.pb.toFixed(1) + ' р.' : '∞'}</span></div>
-                  <div className="sc-saved-metric"><span className="sc-saved-metric-label">Прибуток</span><span style={{ color: netColor }}>{fM(s.metrics.net)}</span></div>
+                  <div className="sc-saved-metric"><span className="sc-saved-metric-label">Собів.</span><span style={{ color: scenario.metrics.ecg < scenario.metrics.ep ? 'var(--green)' : 'var(--red)' }}>{fG(scenario.metrics.ecg)}</span></div>
+                  <div className="sc-saved-metric"><span className="sc-saved-metric-label">Окупн.</span><span style={{ color: pbColor }}>{scenario.metrics.pb ? `${scenario.metrics.pb.toFixed(1)} р.` : '∞'}</span></div>
+                  <div className="sc-saved-metric"><span className="sc-saved-metric-label">Прибуток</span><span style={{ color: netColor }}>{fM(scenario.metrics.net)}</span></div>
                 </div>
                 <div className="saved-card-actions">
-                  <button className="btn-secondary" onClick={() => handleApply(s)}>Застосувати в калькулятор</button>
+                  <button className="btn-secondary" onClick={() => handleApply(scenario)}>Застосувати в калькулятор</button>
                 </div>
               </div>
             );

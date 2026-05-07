@@ -4,25 +4,25 @@ import { calc } from '../lib/calc.js';
 import { fG, fM, fN } from '../../../shared/lib/formatters.js';
 
 export default function SolarScenariosScreen() {
-  const { P, result: r, dispatch } = useSolar();
+  const { P, result, dispatch } = useSolar();
 
-  const sc = (ov) => calc({ ...P, ...ov });
+  const buildScenario = (overrides) => calc({ ...P, ...overrides });
   const scenarios = [
     {
       title: 'Консервативний',
       badge: 'Низькі ринкові ціни',
       bc: 'var(--bg3)',
       tc: 'var(--text2)',
-      P: { feedInTariff: 2.5, gridPrice: 6.2 },
-      r: sc({ feedInTariff: 2.5, gridPrice: 6.2 }),
+      overrides: { feedInTariff: 2.5, gridPrice: 6.2 },
+      result: buildScenario({ feedInTariff: 2.5, gridPrice: 6.2 }),
     },
     {
       title: 'Базовий (поточний)',
       badge: 'Ваші параметри',
       bc: 'var(--green-bg)',
       tc: 'var(--green)',
-      P: {},
-      r,
+      overrides: {},
+      result,
       best: true,
     },
     {
@@ -30,17 +30,25 @@ export default function SolarScenariosScreen() {
       badge: 'Більше власного споживання',
       bc: 'var(--blue-bg)',
       tc: 'var(--blue)',
-      P: { selfUseShare: 0.8, degradation: 0.6 },
-      r: sc({ selfUseShare: 0.8, degradation: 0.6 }),
+      overrides: { selfUseShare: 0.8, degradation: 0.6 },
+      result: buildScenario({ selfUseShare: 0.8, degradation: 0.6 }),
     },
     {
       title: 'Піковий продаж',
       badge: 'Вищий дохід від резервування',
       bc: 'var(--amber-bg)',
       tc: 'var(--amber)',
-      P: { reserveShare: 0.5, reservePeakPremium: 2.4, feedInTariff: 4.8 },
-      r: sc({ reserveShare: 0.5, reservePeakPremium: 2.4, feedInTariff: 4.8 }),
+      overrides: { reserveShare: 0.5, reservePeakPremium: 2.4, feedInTariff: 4.8 },
+      result: buildScenario({ reserveShare: 0.5, reservePeakPremium: 2.4, feedInTariff: 4.8 }),
     },
+  ];
+
+  const metrics = [
+    { label: 'Генерація, кВт·год', format: (r) => fN(r.year1Gen, 0) },
+    { label: 'Дохід, млн', format: (r) => fM(r.totalRevenue, 2) },
+    { label: 'Net, млн', format: (r) => fM(r.net, 2) },
+    { label: 'Окупність', format: (r) => (r.pb ? `${r.pb.toFixed(1)} р.` : '∞') },
+    { label: 'LCOE', format: (r) => fG(r.lcoe, 2) },
   ];
 
   const applyScenario = (overrides) => {
@@ -49,43 +57,39 @@ export default function SolarScenariosScreen() {
     });
   };
 
-  const metrics = [
-    { l: 'Генерація, кВт·год', f: (s) => fN(s.year1Gen, 0) },
-    { l: 'Дохід, млн', f: (s) => fM(s.totalRevenue, 2) },
-    { l: 'Net, млн', f: (s) => fM(s.net, 2) },
-    { l: 'Окупність', f: (s) => (s.pb ? `${s.pb.toFixed(1)} р.` : '∞') },
-    { l: 'LCOE', f: (s) => fG(s.lcoe, 2) },
-  ];
-
   return (
     <div className="screen active">
       <div className="page-wrap">
         <div className="sc-cards-grid">
-          {scenarios.map((s, i) => (
-            <div key={i} className={`card${s.best ? ' best' : ''}`}>
-              <div className="sc-badge" style={{ background: s.bc, color: s.tc }}>{s.badge}</div>
-              <div className="sc-title">{s.title}</div>
+          {scenarios.map((scenario) => (
+            <div key={scenario.title} className={`card${scenario.best ? ' best' : ''}`}>
+              <div className="sc-card-head">
+                <div className="sc-title">{scenario.title}</div>
+                <div className="sc-badge" style={{ background: scenario.bc, color: scenario.tc }}>{scenario.badge}</div>
+              </div>
+
               <div className="sc-row">
                 <span className="sc-k">Генерація / 1-й рік</span>
-                <span className="sc-v">{fN(s.r.year1Gen, 0)} кВт·год</span>
+                <span className="sc-v">{fN(scenario.result.year1Gen, 0)} кВт·год</span>
               </div>
               <div className="sc-row">
                 <span className="sc-k">LCOE</span>
-                <span className="sc-v">{fG(s.r.lcoe, 2)}</span>
+                <span className="sc-v">{fG(scenario.result.lcoe, 2)}</span>
               </div>
               <div className="sc-row">
                 <span className="sc-k">Net / рік</span>
-                <span className="sc-v" style={{ color: s.r.net > 0 ? 'var(--green)' : 'var(--red)' }}>{fM(s.r.net, 2)}</span>
+                <span className="sc-v" style={{ color: scenario.result.net > 0 ? 'var(--green)' : 'var(--red)' }}>{fM(scenario.result.net, 2)}</span>
               </div>
               <div className="sc-row">
                 <span className="sc-k">Окупність</span>
-                <span className="sc-v" style={{ color: s.r.pb ? (s.r.pb < 5 ? 'var(--green)' : 'var(--amber)') : 'var(--red)' }}>
-                  {s.r.pb ? `${s.r.pb.toFixed(1)} р.` : '∞'}
+                <span className="sc-v" style={{ color: scenario.result.pb ? (scenario.result.pb < 5 ? 'var(--green)' : 'var(--amber)') : 'var(--red)' }}>
+                  {scenario.result.pb ? `${scenario.result.pb.toFixed(1)} р.` : '∞'}
                 </span>
               </div>
-              {!s.best && (
+
+              {!scenario.best && (
                 <div className="saved-card-actions">
-                  <button className="btn-secondary" onClick={() => applyScenario(s.P)}>Застосувати</button>
+                  <button className="btn-secondary" onClick={() => applyScenario(scenario.overrides)}>Застосувати</button>
                 </div>
               )}
             </div>
@@ -98,17 +102,17 @@ export default function SolarScenariosScreen() {
             <thead>
               <tr>
                 <th></th>
-                {scenarios.map((s, i) => (
-                  <th key={i} style={{ color: s.tc, fontSize: 10 }}>{s.title.split(' ')[0]}</th>
+                {scenarios.map((scenario) => (
+                  <th key={scenario.title} style={{ color: scenario.tc, fontSize: 10 }}>{scenario.title.split(' ')[0]}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {metrics.map((m, mi) => (
-                <tr key={mi}>
-                  <td>{m.l}</td>
-                  {scenarios.map((s, si) => (
-                    <td key={si}>{m.f(s.r)}</td>
+              {metrics.map((metric) => (
+                <tr key={metric.label}>
+                  <td>{metric.label}</td>
+                  {scenarios.map((scenario) => (
+                    <td key={`${scenario.title}-${metric.label}`}>{metric.format(scenario.result)}</td>
                   ))}
                 </tr>
               ))}
