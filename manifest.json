@@ -1,0 +1,18 @@
+{
+  "name": "EnergyROI",
+  "short_name": "EnergyROI",
+  "description": "Калькулятор окупності енергетичних об'єктів: КГУ, СЕС та інших",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme_color": "#1d4ed8",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
