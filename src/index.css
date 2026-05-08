@@ -1,5 +1,3 @@
-/* index.css — мінімальний reset для калькулятора КГУ */
-
 *, *::before, *::after {
   box-sizing: border-box;
 }

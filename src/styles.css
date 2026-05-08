@@ -1000,7 +1000,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   color: #fff;
 }
 
-/* в”Ђв”Ђ P&L table в”Ђв”Ђ */
 .pnl-row {
   display: flex;
   align-items: center;
@@ -1047,7 +1046,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   flex-shrink: 0;
 }
 
-/* в”Ђв”Ђ Balance table в”Ђв”Ђ */
 .bt {
   width: 100%;
   border-collapse: collapse;
@@ -1087,7 +1085,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   border-bottom: none;
 }
 
-/* в”Ђв”Ђ Info boxes в”Ђв”Ђ */
 .ib {
   border-radius: 10px;
   padding: 12px 16px;
@@ -1111,7 +1108,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   color: #78350f;
 }
 
-/* в”Ђв”Ђ Scenario cards в”Ђв”Ђ */
 .sc-badge {
   display: inline-block;
   font-size: 12px;
@@ -1153,7 +1149,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   border-width: 2px !important;
 }
 
-/* в”Ђв”Ђ CF table в”Ђв”Ђ */
 .cf-row {
   display: flex;
   align-items: center;
@@ -1187,7 +1182,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   flex-shrink: 0;
 }
 
-/* в”Ђв”Ђ Sensitivity table в”Ђв”Ђ */
 .st {
   width: 100%;
   border-collapse: collapse;
@@ -1220,7 +1214,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   font-weight: 400;
 }
 
-/* в”Ђв”Ђ Chart в”Ђв”Ђ */
 .chart-wrap {
   position: relative;
   width: 100%;
@@ -1239,7 +1232,6 @@ canvas {
   height: 100%;
 }
 
-/* в”Ђв”Ђ Misc в”Ђв”Ђ */
 .title-row {
   display: flex;
   justify-content: space-between;
@@ -1440,7 +1432,6 @@ canvas {
   color: var(--text);
 }
 
-/* в”Ђв”Ђ Saved scenarios в”Ђв”Ђ */
 .save-modal { margin-bottom: 16px; }
 
 .save-input {
@@ -1722,7 +1713,6 @@ canvas {
   }
 }
 
-/* в”Ђв”Ђ РњС–РЅС–РјР°Р»СЊРЅР° С€РёСЂРёРЅР° РґР»СЏ РјР°Р»РёС… РµРєСЂР°РЅС–РІ в”Ђв”Ђ */
 @media (max-width: 378px) {
   .mg { grid-template-columns: 1fr 1fr; gap: 8px; }
   .m { padding: 12px; }
@@ -1739,7 +1729,6 @@ canvas {
   }
 }
 
-/* в”Ђв”Ђ Print report в”Ђв”Ђ */
 .print-report { display: none; }
 
 @media print {
@@ -1850,7 +1839,6 @@ canvas {
     color: #aaa;
   }
 }
-
 
 .brand-logo {
   width: 28px;

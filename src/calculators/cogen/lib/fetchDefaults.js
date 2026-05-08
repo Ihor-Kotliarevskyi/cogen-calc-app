@@ -1,10 +1,6 @@
 ﻿import { DEF } from './calc.js';
 import { fetchTariffSnapshot } from '../../../shared/lib/tariffApi.js';
 
-/**
- * Fetch market defaults from API (if configured) with fallback to market-data.json.
- * Returns { defaults, meta } where meta has update date & sources.
- */
 export async function fetchMarketDefaults() {
   try {
     const data = await fetchTariffSnapshot();
